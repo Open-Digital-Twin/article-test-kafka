@@ -7,10 +7,6 @@ services:
       - '2181:2181'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-    networks:
-      default:
-        external:
-          name: bridge
   kafka:
     image: 'bitnami/kafka:latest'
     container_name: kafka
@@ -24,7 +20,7 @@ services:
       - zookeeper
     networks:
       - bridge
-    networks:
-      default:
-        external:
-          name: bridge
+networks:
+   default:
+      external:
+         name: bridge
