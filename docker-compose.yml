@@ -20,3 +20,6 @@ services:
       - zookeeper
     networks:
       - bridge
+    networks:
+      bridge:
+        driver: bridge
