@@ -1,9 +1,9 @@
 version: "3"
 services:
   mosquitto:
-    image: eclipse-mosquitto
+    image: eclipse-mosquitto:1.6.8
     hostname: mosquitto
-    container_name: mosquitto
+    container_name: mmosquitto
     expose:
       - "1933"
       - "9001"
@@ -12,19 +12,19 @@ services:
       - "9001:9001"
   zookeeper:
     image: 'bitnami/zookeeper:latest'
-    container_name: zookeeper
+    container_name: mzookeeper
     ports:
       - '2181:2181'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
   kafka:
     image: 'bitnami/kafka:latest'
-    container_name: kafka
+    container_name: mkafka
     ports:
       - '9092:9092'
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ZOOKEEPER_CONNECT=mzookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper 

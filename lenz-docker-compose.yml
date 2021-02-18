@@ -1,0 +1,191 @@
+version: "3.2"
+volumes:
+  configFolder:
+services:
+  fastdata:
+    image: lensesio/fast-data-dev
+    container_name: fastdata
+    ports:
+      - 3030:3030
+      - 9092:9092
+      - 8081:8081
+    environment:
+      - SAMPLEDATA=0
+      - REST_PORT=0
+      - FORWARDLOGS=0
+      - RUNTESTS=0
+      - DISABLE_JMX=1
+      - CONNECTORS=${CONNECTOR}
+      - WEB_PORT=0
+      - DISABLE=hive-1.1
+  cassandra:
+    image: cassandra
+    container_name: cassandra
+    depends_on: 
+    - fastdata    
+    ports: 
+      - 9042:9042    
+  coap-server:
+    image: aleravat/coap-test-server
+    container_name: coap-server
+    depends_on: 
+    - fastdata    
+    ports:
+      - 5683:5683/udp
+      - 5684:5684
+  coap:
+    image: nning2/coap
+    container_name: coap
+    depends_on: 
+    - fastdata
+    - coap-server 
+    entrypoint: /bin/sh
+    tty: true
+  mqtt:
+    image: eclipse-mosquitto
+    container_name: mqtt
+    depends_on: 
+    - fastdata    
+    ports:
+      - 8080:8080 
+      - 1883:1883
+  rethink:
+    image: rethinkdb
+    container_name: rethinkdb
+    depends_on: 
+    - fastdata        
+    ports:
+      - 8080:8080
+      - 28015:28015
+  pulsar:
+    image: apachepulsar/pulsar:1.22.0-incubating
+    container_name: pulsar  
+    depends_on: 
+    - fastdata  
+    ports:
+      - 6650:6650
+      - 8080:8080  
+    command: bin/pulsar standalone --advertised-address pulsar
+  activemq:
+    image: rmohr/activemq
+    container_name: activemq
+    depends_on: 
+    - fastdata    
+    ports:
+      - 61616:61616
+      - 8161:8161
+  influxdb:
+    image: influxdb
+    container_name: influxdb
+    depends_on: 
+    - fastdata    
+    ports:
+      - 8086:8086
+  mongo:
+    image: mongo
+    container_name: mongo
+    depends_on: 
+    - fastdata    
+    ports:
+      - 27017:27017
+  hazelcast:
+    image: hazelcast/hazelcast:3.8.4
+    container_name: hazelcast
+    depends_on: 
+    - fastdata
+    ports:
+      - 5701:5701 
+    entrypoint: /bin/bash
+    tty: true
+  redis:
+    image: redis 
+    container_name: redis
+    depends_on: 
+    - fastdata
+    ports:
+      - 6379:6379         
+  hbase:
+    image: harisekhon/hbase
+    container_name: hbase
+    depends_on: 
+    - fastdata    
+    ports:
+      - 2181:2181
+  voltdb:
+    image: voltdb/voltdb-community
+    container_name: voltdb
+    environment: 
+    - HOST_COUNT=1
+    - name=node1    
+    depends_on: 
+    - fastdata    
+  ftp:
+    image: stilliard/pure-ftpd    
+    container_name: ftp
+    depends_on: 
+    - fastdata    
+  elastic:
+    image: elasticsearch:6.8.8   
+    container_name: elastic
+    depends_on: 
+    - fastdata    
+    environment: 
+    - cluster.name=elasticsearch
+    ports:
+    - 9200:9200
+    - 9300:9300
+  kudu:
+    image: josemyd/impala-kudu
+    container_name: kudu
+    depends_on: 
+    - fastdata    
+
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop-hive.env
+    ports:
+      - "50070:50070"
+      - "8020:8020"
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    depends_on:
+      - namenode
+    env_file:
+      - ./hadoop-hive.env
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070"
+    ports:
+      - "50075:50075"
+
+  hive-server:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive
+    env_file:
+      - ./hadoop-hive.env
+    depends_on: 
+    - hive-metastore
+    - hive-metastore-postgresql
+    - datanode
+    - fastdata  
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+    ports:
+      - "10000:10000"
+
+  hive-metastore:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    env_file:
+      - ./hadoop-hive.env
+    command: /opt/hive/bin/hive --service metastore
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 hive-metastore-postgresql:5432"
+    ports:
+      - "9083:9083"
+
+  hive-metastore-postgresql:
+    image: bde2020/hive-metastore-postgresql:2.3.0
