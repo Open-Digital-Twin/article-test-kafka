@@ -1,0 +1,1 @@
+docker exec -ti mqtt  mosquitto_pub  -m "{\"deviceId\":1,\"value\":31.1,\"region\":\"EMEA\",\"timestamp\":7}" -d -r -t /mjson

@@ -1,0 +1,22 @@
+docker run -d       -e ID=01       -e BS=kafka:9092        -e ZK=zookeeper:2181       -e SR=http://schema:8081        -e HOST=localhost:8085      -e PORT=8085      -p 8085:8085      landoop/fast-data-dev-connect-cluster
+
+
+
+
+  fastdata:
+    image: landoop/fast-data-dev-connect-cluster
+    depends_on:
+      - kafka
+      - zookeeper
+      - schema
+    container_name: fastdata
+    expose:
+      - "8085"
+    ports:
+      - 8085:8085
+    environment:
+      - ID=01
+      - BS=kafka:9092
+      - ZK=zookeeper:2181
+      - SR=http://schema:8081
+      - HOST=172.20.0.1

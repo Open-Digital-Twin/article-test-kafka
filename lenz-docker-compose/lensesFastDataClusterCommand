@@ -1,0 +1,9 @@
+docker run -d \
+       -e ID=01 \
+       -e BS=kafka:9092 \
+       -e ZK=zookeeper:2181 \
+       -e SR=http://schema:8081 \
+       -e HOST=172.20.0.1
+       -e PORT=8085
+       -p 8085:8085
+       landoop/fast-data-dev-connect-cluster
