@@ -1,0 +1,12 @@
+version: "3"
+services:
+  mosquitto:
+    image: eclipse-mosquitto:1.6.8
+    hostname: mosquitto
+    container_name: mmosquitto
+    expose:
+      - "1933"
+      - "9001"
+    ports:
+      - "11883:1933"
+      - "9001:9001"
