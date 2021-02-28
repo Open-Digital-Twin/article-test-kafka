@@ -1,9 +1,12 @@
 To begin -> 
+	
 	export CONNECTOR=mqtt
+	
 	docker-compose up -d mqtt
 
 Put connectors on lenses -=-=-=--=-
-	docker cp /<pathToTheFile>/connectorMQTTsource.properties  fastdata:/<CanbeInAfolderOrNot>
+	
+	docker cp /pathToTheFile/connectorMQTTsource.properties  fastdata:/CanbeInAfolderOrNot
 
 Insert and read mosquitto -=-=-=-=-=-=-
 
