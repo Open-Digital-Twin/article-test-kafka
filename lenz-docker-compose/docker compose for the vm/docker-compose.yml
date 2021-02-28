@@ -1,0 +1,20 @@
+version: "3.2"
+volumes:
+  configFolder:
+services:
+  fastdata:
+    image: lensesio/fast-data-dev
+    container_name: fastdata
+    ports:
+      - 3030:3030
+      - 9092:9092
+      - 8081:8081
+    environment:
+      - SAMPLEDATA=0
+      - REST_PORT=0
+      - FORWARDLOGS=0
+      - RUNTESTS=0
+      - DISABLE_JMX=1
+      - CONNECTORS=${CONNECTOR}
+      - WEB_PORT=0
+      - DISABLE=hive-1.1
