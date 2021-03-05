@@ -16,8 +16,9 @@ To begin ->
 			$ docker network connect test-net-2 c1
 
 			To check if two containers (or more) are on a network together:
-			$ docker network inspect test-net -f "{{json .Containers
-		Containers NEED to be in the same network
+			$ docker network inspect test-net -f "{{json .Containers }}"
+			
+		Containers NEED to be in the same network for them to find each other
 
 Put connectors on lenses -=-=-=--=-
 	
