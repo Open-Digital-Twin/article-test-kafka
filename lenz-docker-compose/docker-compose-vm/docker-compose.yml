@@ -4,7 +4,7 @@ volumes:
 services:
   fastdata:
     image: lensesio/fast-data-dev
-    container_name: fastdata
+    container_name: fastdata 
     ports:
       - 3030:3030
       - 9092:9092
@@ -15,6 +15,16 @@ services:
       - FORWARDLOGS=0
       - RUNTESTS=0
       - DISABLE_JMX=1
-      - CONNECTORS=${CONNECTOR}
+      - CONNECTORS=mqtt
       - WEB_PORT=0
       - DISABLE=hive-1.1
+  mqtt:
+    image: eclipse-mosquitto:1.6.8
+    container_name: mqtt    
+    depends_on: 
+      - fastdata 
+    ports:
+      - 8080:8080 
+      - 1883:1883
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
