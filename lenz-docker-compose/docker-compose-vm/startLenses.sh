@@ -2,8 +2,8 @@
 
 echo ""
 echo "Setting connector global variable...(this is the container_name for the mqtt)"
-	export CONNECTOR=mqtt
-
+	export CONNECTOR=$1
+	
 echo ""
 echo "Starting fast data and mqtt..."
 	docker-compose up -d
@@ -11,8 +11,5 @@ echo "Starting fast data and mqtt..."
 sleep 1.5
 
 echo ""
-echo "Copying connector files into fastdata..."
-	docker cp connectorMQTTsource.properties  fastdata:/
-	docker cp connectorMQTTsink.properties  fastdata:/
-
-
+	docker logs fastdata
+echo ""

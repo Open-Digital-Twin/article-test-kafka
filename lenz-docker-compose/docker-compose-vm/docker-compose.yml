@@ -15,7 +15,7 @@ services:
       - FORWARDLOGS=0
       - RUNTESTS=0
       - DISABLE_JMX=1
-      - CONNECTORS=mqtt
+      - CONNECTORS=${CONNECTOR}
       - WEB_PORT=0
       - DISABLE=hive-1.1
   mqtt:
