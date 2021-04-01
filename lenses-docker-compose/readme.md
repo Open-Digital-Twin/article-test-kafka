@@ -1,4 +1,6 @@
-To begin -> 
+This is outdated, there are scripts inside the 'docker-compose-vm' that automate most of this
+
+To begin -> (files needed inside the 'old' folder)
 	
 	export CONNECTOR=mqtt
 	
