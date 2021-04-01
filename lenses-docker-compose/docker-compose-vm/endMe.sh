@@ -5,14 +5,14 @@
 echo ""
 echo "Stoping fastdata... (may take a while)"
 	docker stop fastdata
-	docker stop ${CONNECTOR}
+	docker stop $1
 	
 
 
 echo ""
 echo "Removing fastdata.."
 	docker rm fastdata
-	docker rm ${CONNECTOR}
+	docker rm $1
 	
 
 

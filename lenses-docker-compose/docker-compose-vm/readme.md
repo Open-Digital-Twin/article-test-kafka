@@ -14,4 +14,4 @@
 #then you can follow the readme in the previous folder do vizualise those things happening.
 #end everything with
 
-./endMe.sh
+./endMe.sh mqtt
