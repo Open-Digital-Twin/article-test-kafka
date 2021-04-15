@@ -9,8 +9,7 @@ echo "Copying connector files into fastdata..."
 echo "Copying stream app files into fastdata..."
 	echo "From main file..."
 	docker cp streamApp/streams.examples/target/streams.examples-0.1.jar  fastdata:/
-	#echo "From from back file...THIS IS DEPRECATED AND IT WONT WORK!!!!"
-    #docker cp /media/sf_LubuntuVMfolder/mavenBackup/streams.examples/target/streams.examples-0.1.jar fastdata:/
+
 
 sleep 1.5
 

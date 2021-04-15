@@ -32,4 +32,7 @@ Then, do
 		
 		To check your mqtt msgs after passing through the processor
 		
-		
+
+After you can open a new terminal window and run
+	./listenMQTT.sh mqtt
+	>> observe that you need to have this opened prior to the sending of the messages for you to see.

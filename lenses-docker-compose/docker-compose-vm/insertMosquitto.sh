@@ -14,5 +14,5 @@ export CONNECTOR=$1
   		# Construct random temperature value from first 3 digits of random number
   		temp="`echo $rNum|cut -c 1`.`echo $rNum|cut -c 2-3`"
   		
-		docker exec -ti ${CONNECTOR}  mosquitto_pub -u producer -m "{\"value\":\"${temp}ae\"}" -d -r -t /lenses/sending
+		docker exec -ti ${CONNECTOR}  mosquitto_pub -u producer -m "{\"value\":\"${temp}\"}" -d -r -t /lenses/sending
 	done
