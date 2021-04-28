@@ -55,6 +55,24 @@
 
     <build>
         <plugins>
+            <!-- Plugin to building a jar with dependencies, without worring about versioning and stuff -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+     		    <artifactId>maven-assembly-plugin</artifactId>
+    			<version>3.1.0</version>  
+    	        <configuration>
+    		        <appendAssemblyId>false</appendAssemblyId>
+    		        <archive>
+       			        <manifest>
+      			            <mainClass>fully.qualified.MainClass</mainClass>
+     			        </manifest>
+    			    </archive>
+     			    <descriptorRefs>
+    			        <descriptorRef>jar-with-dependencies</descriptorRef>
+    			    </descriptorRefs>
+    			</configuration>
+ 		    </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -65,7 +83,7 @@
                 </configuration>
             </plugin>
         </plugins>
-
+        <!-- this thing seems to be so maven compiles with java8, but, project would only work if I set java 8 as the main java vm, so IDK wtf is this about-->
         <pluginManagement>
             <plugins>
                 <plugin>

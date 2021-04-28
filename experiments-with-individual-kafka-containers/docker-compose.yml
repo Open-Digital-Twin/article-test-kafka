@@ -1,21 +1,76 @@
 version: "3"
 services:
+#---------------------------MQTT service -----------------------------------------------
+  mqtt:
+    image: 'eclipse-mosquitto:1.6.8'
+    container_name: mqtt 
+    ports:
+      - 8080:8080 
+      - 1883:1883
+#---------------------------Zookeeper service ------------------------------------------
   zookeeper:
-    image: 'bitnami/zookeeper:latest'
+    image: 'confluentinc/cp-zookeeper:latest'
     container_name: zookeeper
-    ports:
-      - '2181:2181'
+    networks: 
+      - broker-kafka
+    depends_on:
+      - mqtt
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVER_ID: 1
+#-----------------------------Kafka service --------------------------------------------
   kafka:
-    image: 'bitnami/kafka:latest'
+    image: 'confluentinc/cp-kafka:latest'
     container_name: kafka
-    ports:
-      - '9092:9092'
-    environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks: 
+      - broker-kafka
     depends_on:
       - zookeeper
-
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # Schema Validation
+      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema:8081
+      #KAFKA_CONFLUENT_BASIC_AUTH_CREDENTIALS_SOURCE: USER_INFO
+      #KAFKA_CONFLUENT_BASIC_AUTH_USER_INFO: 'superUser:superUser'
+      #KAFKA_CONFLUENT_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka1.truststore.jks
+      #KAFKA_CONFLUENT_SSL_TRUSTSTORE_PASSWORD: confluent
+      #KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/secrets/broker_jaas.conf
+#-----------------------------Kafdrop service -------------------------------------------     
+  kafdrop:
+    image: 'obsidiandynamics/kafdrop:latest'
+    container_name: kafdrop
+    depends_on:
+      - kafka
+    ports:
+      - 9000:9000
+    environment:
+      KAFKA_BROKERCONNECT: PLAINTEXT://kafka:9092
+#-----------------------------Schema service --------------------------------------------
+  schema:
+    image: 'confluentinc/cp-schema-registry:latest'
+    container_name: schemaregistry
+    # idk why this is here
+    restart: always
+    depends_on:
+      - kafka
+    ports:
+      - 8081:8081
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
+      SCHEMA_REGISTRY_DEBUG: 'true'
+#-----------------------------Networks --------------------------------------------------
+networks: 
+  broker-kafka:
+    driver: bridge  
+      

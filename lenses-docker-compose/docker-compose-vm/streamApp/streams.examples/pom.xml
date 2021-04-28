@@ -25,6 +25,8 @@
     <version>0.1</version>
     <packaging>jar</packaging>
 
+  
+    
     <name>Kafka Streams Quickstart :: Java</name>
 
     <properties>
@@ -32,8 +34,13 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>2.7.0</kafka.version>
-        <slf4j.version>1.7.7</slf4j.version>
+        <slf4j.version>1.7.9</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
+        <avro.version>1.9.1</avro.version>
+        <gson.version>2.2.4</gson.version>
+        <schemaRegistryUrl>http://localhost:8081</schemaRegistryUrl>
+ <!--   <schemaLocal>src/main/resources/avro/io/confluent/examples/clients/cloud/DataRecordAvro2a.avsc</schemaLocal> -->
+ <!--   <io.confluent.schema-registry.version>${confluent.version.range}</io.confluent.schema-registry.version> -->
     </properties>
 
     <repositories>
@@ -54,7 +61,13 @@
             </snapshots>
         </repository>
     </repositories>
-
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>confluent</id>
+            <url>https://packages.confluent.io/maven/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <!--
 		Execute "mvn clean package -Pbuild-jar"
 		to build a jar file out of this project!
@@ -89,8 +102,26 @@
      			   <descriptorRefs>
     			      <descriptorRef>jar-with-dependencies</descriptorRef>
     			    </descriptorRefs>
-    			  </configuration>
+    		   </configuration>    
  			   </plugin>
+ 			   <plugin>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro-maven-plugin</artifactId>
+                <version>${avro.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>schema</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>src/main/resources/avro/io/confluent/examples/streams</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <stringType>String</stringType>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
@@ -159,7 +190,7 @@
          <dependency> 
 	         <groupId>org.slf4j</groupId> 
 	         <artifactId>slf4j-simple</artifactId> 
-	         <version>1.7.9</version> 
+	         <version>${slf4j.version}</version> 
          </dependency>
          <!-- https://mvnrepository.com/artifact/io.confluent/kafka-streams-avro-serde -->
 <!-- https://mvnrepository.com/artifact/io.confluent/kafka-streams-avro-serde -->
@@ -172,6 +203,12 @@
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
+		    <version>2.12.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-core</artifactId>
 		    <version>2.12.2</version>
 		</dependency>
     </dependencies>

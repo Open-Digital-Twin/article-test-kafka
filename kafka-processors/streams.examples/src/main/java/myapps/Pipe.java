@@ -25,6 +25,8 @@ import org.apache.kafka.streams.Topology;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
+// BUILD THIS WITH ::  mvn clean compile assembly:single
+
 /**
  * In this example, we implement a simple LineSplit program using the high-level Streams DSL
  * that reads from a source topic "streams-plaintext-input", where the values of messages represent lines of text,
