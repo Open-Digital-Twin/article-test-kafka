@@ -28,6 +28,7 @@ import java.util.Properties;
 //import java.util.HashMap;
 //import java.util.Map;
 //import java.util.Collections;
+import java.lang.Math;
 
 // this needs mvn eclipse:eclipse so that eclipse can find the java stuff to auto complete
 // BUILD THIS WITH ::  mvn clean compile assembly:single
@@ -62,38 +63,52 @@ public class Pipe {
         
 //        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, SpecificAvroSerde.class);
 //        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
-        // setting offset reset to earliest so that we can re-run the demo code with the same pre-loaded data
+//        setting offset reset to earliest so that we can re-run the demo code with the same pre-loaded data
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        //final ObjectMapper objectMapper = new ObjectMapper();
+//        final ObjectMapper objectMapper = new ObjectMapper();
         StreamsBuilder builder = new StreamsBuilder();
 
-        final KStream<String, Long> source = builder.stream(SOURCE_TOPIC,
-                Consumed.with(Serdes.String(), Serdes.Long()));
+        final KStream<String, String> source = builder.stream(SOURCE_TOPIC,
+                Consumed.with(Serdes.String(), Serdes.String()));
         
-//        KStream<String, Long> transformed = source.map(
-//        	    (key, value) -> KeyValue.pair(key.toLowerCase(), value.longValue()));
+//        KStream<String, String> transformed = source.mapValues(value -> value);
 
-        KStream<String, Long> transformed = source.map(
-        	    new KeyValueMapper<String, Long, KeyValue<String, Long>>() {
-        	      @Override
-        	      public KeyValue<String, Long> apply(String key, Long value) {
-        	        return new KeyValue<>(key.toLowerCase(), Long.valueOf(05));
-        	      }
-        	    });
-        
-//        KStream<String, Long> transformed = source.filter((key, value) -> value > 50);
-        
-//        KStream<String, Long> transformed = source.filterNot(
-//        	    new Predicate<String, Long>() {
+//        KStream<String, Long> transformed = source.map(
+//        	    new KeyValueMapper<String, Long, KeyValue<String, Long>>() {
 //        	      @Override
-//        	      public boolean test(String key, Long value) {
-//        	        return value <= 50;
+//        	      public KeyValue<String, Long> apply(String key, Long value) {
+//        	        return new KeyValue<>(key.toUpperCase(), value);
 //        	      }
 //        	    });
+        KStream<String, String> transformed = source.mapValues(
+        	    new ValueMapper<String, String>() {
+        	      @Override
+        	      public String apply(String value) {
+        	    	Double temp = Double.parseDouble(value);
+        	    	
+        	    	Double logOf = Math.log(temp);
+        	    	String result = Double.toString(logOf);
+        	        
+        	    	return result;
+        	      }
+        	    });
+//        KStream<String, Long> transformed = source.filter((key, value) -> value > 50);
         
+        //--------------------------------------------------------------------------------------------------------------
+        // This is the filter, it works and it filters if the number is higher than 50, if so it forwards the message to
+        // the sink topic
+//        KStream<String, String> transformed = source.filterNot(
+//        	    new Predicate<String, String>() {
+//        	      @Override
+//        	      public boolean test(String key, String value) {
+//        	    	float temp = Float.parseFloat(value);
+//        	    	return temp <= 50;
+//        	      }
+//        	    });
+        //--------------------------------------------------------------------------------------------------------------
         
-        transformed.to(SINK_TOPIC, Produced.valueSerde(Serdes.Long()));
+        transformed.to(SINK_TOPIC, Produced.valueSerde(Serdes.String()));
 //        
 //        ClassCastException while producing data to topic mqttOut. A serializer 
 //        (key: org.apache.kafka.common.serialization.ByteArraySerializer / 
