@@ -57,7 +57,8 @@ public class Pipe {
         props.put(StreamsConfig.CLIENT_ID_CONFIG, "streams-pipe-client");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
-        // old props
+        // This is so you don't need to declare everytime which Serdes produces or consumes, but I declare anyways
+        // since it makes easier to read after
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         
@@ -71,29 +72,27 @@ public class Pipe {
 
         final KStream<String, String> source = builder.stream(SOURCE_TOPIC,
                 Consumed.with(Serdes.String(), Serdes.String()));
-        
-//        KStream<String, String> transformed = source.mapValues(value -> value);
 
-//        KStream<String, Long> transformed = source.map(
-//        	    new KeyValueMapper<String, Long, KeyValue<String, Long>>() {
-//        	      @Override
-//        	      public KeyValue<String, Long> apply(String key, Long value) {
-//        	        return new KeyValue<>(key.toUpperCase(), value);
-//        	      }
-//        	    });
-        KStream<String, String> transformed = source.mapValues(
+        //---------------------------------------------------------------------------------------------------------------
+        // This is the logarithm processor, and  it works. It simply uses mapValues to get each value and apply the
+        // log function from the Math library
+        	KStream<String, String> transformed = source.mapValues(
         	    new ValueMapper<String, String>() {
         	      @Override
         	      public String apply(String value) {
         	    	Double temp = Double.parseDouble(value);
-        	    	
+        	        // this is ugly but since kafka is extremely annoying to work with anything 
+        	    	// but strings, it will have to do (for now)
         	    	Double logOf = Math.log(temp);
         	    	String result = Double.toString(logOf);
         	        
         	    	return result;
         	      }
         	    });
-//        KStream<String, Long> transformed = source.filter((key, value) -> value > 50);
+         //---------------------------------------------------------------------------------------------------------------
+        
+        //You CAN make those functions as lambda, but then idk how to access inside the functions to apply the logic, so
+        // i did not use lambda
         
         //--------------------------------------------------------------------------------------------------------------
         // This is the filter, it works and it filters if the number is higher than 50, if so it forwards the message to
