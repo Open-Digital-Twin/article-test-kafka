@@ -1,12 +1,14 @@
 package myapps;
 
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.common.serialization.Serde;
 // APACHE STREAMS IMPORTS
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.kstream.*;
 //import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.KeyValue;
@@ -24,6 +26,8 @@ import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 // JAVA IMPORTS
 //import java.io.IOException;
 import java.util.Properties;
+import java.util.Arrays;
+import java.util.Locale;
 //import java.util.concurrent.CountDownLatch;
 //import java.util.HashMap;
 //import java.util.Map;
@@ -74,21 +78,33 @@ public class Pipe {
                 Consumed.with(Serdes.String(), Serdes.String()));
 
         //---------------------------------------------------------------------------------------------------------------
+        // Word count
+        KStream<String, String> transformed = source;
+        transformed.flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split("\\W+")))
+              .groupBy((key, value) -> value)
+              .count(Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("counts-store"))
+              .toStream()
+              .to(SINK_TOPIC, Produced.with(Serdes.String(), Serdes.Long()));
+	            
+	            
+//	            transformed.to(SINK_TOPIC, Produced.valueSerde(Serdes.String()));
+
+        //---------------------------------------------------------------------------------------------------------------
         // This is the logarithm processor, and  it works. It simply uses mapValues to get each value and apply the
         // log function from the Math library
-        	KStream<String, String> transformed = source.mapValues(
-        	    new ValueMapper<String, String>() {
-        	      @Override
-        	      public String apply(String value) {
-        	    	Double temp = Double.parseDouble(value);
-        	        // this is ugly but since kafka is extremely annoying to work with anything 
-        	    	// but strings, it will have to do (for now)
-        	    	Double logOf = Math.log(temp);
-        	    	String result = Double.toString(logOf);
-        	        
-        	    	return result;
-        	      }
-        	    });
+//        	KStream<String, String> transformed = source.mapValues(
+//        	    new ValueMapper<String, String>() {
+//        	      @Override
+//        	      public String apply(String value) {
+//        	    	Double temp = Double.parseDouble(value);
+//        	        // this is ugly but since kafka is extremely annoying to work with anything 
+//        	    	// but strings, it will have to do (for now)
+//        	    	Double logOf = Math.log(temp);
+//        	    	String result = Double.toString(logOf);
+//        	        
+//        	    	return result;
+//        	      }
+//        	    });
          //---------------------------------------------------------------------------------------------------------------
         
         //You CAN make those functions as lambda, but then idk how to access inside the functions to apply the logic, so
@@ -97,7 +113,7 @@ public class Pipe {
         //--------------------------------------------------------------------------------------------------------------
         // This is the filter, it works and it filters if the number is higher than 50, if so it forwards the message to
         // the sink topic
-//        KStream<String, String> transformed = source.filterNot(
+//        KStream<String, String> filtro = source.filterNot(
 //        	    new Predicate<String, String>() {
 //        	      @Override
 //        	      public boolean test(String key, String value) {
@@ -107,7 +123,6 @@ public class Pipe {
 //        	    });
         //--------------------------------------------------------------------------------------------------------------
         
-        transformed.to(SINK_TOPIC, Produced.valueSerde(Serdes.String()));
 //        
 //        ClassCastException while producing data to topic mqttOut. A serializer 
 //        (key: org.apache.kafka.common.serialization.ByteArraySerializer / 
