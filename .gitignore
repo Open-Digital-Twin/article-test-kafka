@@ -22,7 +22,6 @@ A complete .gitignore file for Java - https://www.dedunu.info/2014/11/gitignore-
 ##############################
 .mtj.tmp/
 *.class
-*.jar
 *.war
 *.ear
 *.nar
