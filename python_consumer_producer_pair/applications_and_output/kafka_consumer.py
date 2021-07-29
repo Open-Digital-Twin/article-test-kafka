@@ -5,16 +5,19 @@ import random
 from time import sleep
 from datetime import datetime
 from subprocess import getoutput
+from sys import argv, exit
 
+if not len(argv) == 3:
+    exit('this program requires 2 arguments, first the port then the topic')
 
-#kafka topic to read the messages
-topic = 'messages'
+topic = argv[1]
+port = argv[2]
 
 index = count()
 
 # Create an instance of the Kafka producer
 consumer = KafkaConsumer(topic,
-                         bootstrap_servers=['localhost:29092'],
+                         bootstrap_servers=['localhost:%s' % port],
                          auto_offset_reset='earliest',
                          enable_auto_commit=True,
                          group_id='my-group',
