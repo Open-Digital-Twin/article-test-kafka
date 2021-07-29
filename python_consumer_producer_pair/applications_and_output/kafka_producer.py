@@ -1,3 +1,4 @@
+from kafka import KafkaProducer
 from json import loads, dumps
 import random
 from time import sleep
