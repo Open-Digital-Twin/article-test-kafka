@@ -4,6 +4,7 @@ from itertools import count
 import random
 from time import sleep
 from datetime import datetime
+from subprocess import getoutput
 
 
 #kafka topic to read the messages
@@ -22,14 +23,14 @@ consumer = KafkaConsumer(topic,
 
 with open('output_consumer', 'w', buffering=1) as redf:
 
-    redf.write('x_value,delay\n')
-
     print("Ctrl+c to Stop")
     # Call the producer.send method with a producer-record
     for message in consumer:
         now = datetime.now()
         contents = {'message': str(message.value) , 'read_when': str(datetime.timestamp(now)), 'timedelta': str(datetime.timestamp(now) - float(message.value['timestamp'])) } 
-        redf.write(str(next(index)) + ',' + contents['timedelta'] + '\n')
+        # stuff = getoutput('docker stats 7b0ab8128574 --format \"{{.Name}},{{.CPUPerc}},{{.MemUsage}}\" --no-stream')
+        # docker takes waaay too long to do this stuff
+        redf.write('stuff' + ',' + contents['timedelta'] + '\n')
         print(contents)
 
 
