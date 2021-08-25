@@ -6,18 +6,19 @@ from time import sleep
 from datetime import datetime
 from subprocess import getoutput
 from sys import argv, exit
-
-if not len(argv) == 3:
-    exit('this program requires 2 arguments, first the port then the topic')
+import time
+if not len(argv) == 4:
+    exit('this program requires 3 arguments, first the topic, then server and the port')
 
 topic = argv[1]
-port = argv[2]
+server = argv[2]
+port = argv[3]
 
 index = count()
 
 # Create an instance of the Kafka producer
 consumer = KafkaConsumer(topic,
-                         bootstrap_servers=['localhost:%s' % port],
+                         bootstrap_servers=server+':'+port,
                          auto_offset_reset='earliest',
                          enable_auto_commit=True,
                          group_id='my-group',
@@ -28,12 +29,17 @@ with open('output_consumer', 'w', buffering=1) as redf:
 
     print("Ctrl+c to Stop")
     # Call the producer.send method with a producer-record
+    i = 0
     for message in consumer:
-        now = datetime.now()
-        contents = {'message': str(message.value) , 'read_when': str(datetime.timestamp(now)), 'timedelta': str(datetime.timestamp(now) - float(message.value['timestamp'])) } 
+        
+        contents = {'topic': str(message.topic), 'timestamp': str(time.strftime('%Y/%m/%d %H:%M:%S.%f', time.gmtime(int(message.timestamp)/1000.))), 'value': str(message.value)} 
+        if not contents:
+            break
+        if i == 0:
+            first_message_timestamp = message.timestamp
+            i = 1
         # stuff = getoutput('docker stats 7b0ab8128574 --format \"{{.Name}},{{.CPUPerc}},{{.MemUsage}}\" --no-stream')
         # docker takes waaay too long to do this stuff
-        redf.write('stuff' + ',' + contents['timedelta'] + '\n')
+        time_passage = int(message.timestamp) - int(first_message_timestamp)
+        redf.write(f'{message.topic},{message.timestamp},{message.value},{time_passage} \n')
         print(contents)
-
-

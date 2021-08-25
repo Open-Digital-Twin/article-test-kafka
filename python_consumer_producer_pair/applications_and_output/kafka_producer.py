@@ -5,25 +5,26 @@ from time import sleep
 from datetime import datetime
 from sys import argv, exit
 
-if not len(argv) == 3:
-    exit('this program requires 2 arguments, first the port then the topic')
+if not len(argv) == 4:
+    exit('this program requires 3 arguments, first the topic, second the server name, and then the port')
 
 topic = argv[1]
-port = argv[2]
-    
+server = argv[2]
+port = argv[3]
 
-#kafka topic to send the message
-topic = 'messages'
+number_of_messages = 1000
 
 # Create an instance of the Kafka producer
-producer = KafkaProducer(bootstrap_servers='localhost:%s' % port,
+producer = KafkaProducer(bootstrap_servers=server+':'+port,
                          value_serializer=lambda x: dumps(x).encode('utf-8')
                         )
 
 # Call the producer.send method with a producer-record
 print("Ctrl+c to Stop")
-while True:
-    now = datetime.now()
-    data = {'value':str(random.randint(1,999)), 'timestamp': str(datetime.timestamp(now))}
+i = 0
+while i < number_of_messages:
+    data = {'value':str(random.randint(1,999))}
     producer.send(topic, data)
+    i += 1
+    print(data)
     sleep(1)
