@@ -23,7 +23,8 @@ producer = KafkaProducer(bootstrap_servers=server+':'+port,
 print("Ctrl+c to Stop")
 i = 0
 while i < number_of_messages:
-    data = {'value':str(random.randint(1,999))}
+	time = datetime.timestamp(datetime.now())
+    data = {'value':str(random.randint(1,999)), 'producer_time': time}
     producer.send(topic, data)
     i += 1
     print(data)

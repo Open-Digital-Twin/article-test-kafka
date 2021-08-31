@@ -31,7 +31,7 @@ with open('output_consumer', 'w', buffering=1) as redf:
     # Call the producer.send method with a producer-record
     i = 0
     for message in consumer:
-        
+        time = datetime.timestamp(datetime.now())
         contents = {'topic': str(message.topic), 'timestamp': str(time.strftime('%Y/%m/%d %H:%M:%S.%f', time.gmtime(int(message.timestamp)/1000.))), 'value': str(message.value)} 
         if not contents:
             break
@@ -42,4 +42,4 @@ with open('output_consumer', 'w', buffering=1) as redf:
         # docker takes waaay too long to do this stuff
         time_passage = int(message.timestamp) - int(first_message_timestamp)
         redf.write(f'{message.topic},{message.timestamp},{message.value},{time_passage} \n')
-        print(contents)
+        print(f'{contents},{time}')

@@ -1,9 +1,5 @@
 FROM python:3.6.8
 
-ARG HOST_USER
-ARG HOST_USER_ID
-ARG HOST_GROUP_ID
-
 RUN apt-get update && \
 	apt-get -y install bash git ca-certificates
 
