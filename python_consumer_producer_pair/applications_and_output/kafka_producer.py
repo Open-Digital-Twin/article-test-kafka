@@ -28,4 +28,4 @@ while i < number_of_messages:
     producer.send(topic, data)
     i += 1
     print(data)
-    sleep(1)
+    sleep(0.001)
