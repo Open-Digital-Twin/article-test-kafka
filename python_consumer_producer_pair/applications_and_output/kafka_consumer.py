@@ -32,7 +32,7 @@ with open('output_consumer', 'w', buffering=1) as redf:
     i = 0
     for message in consumer:
         time = datetime.timestamp(datetime.now())
-        contents = {'topic': str(message.topic), 'timestamp': str(time.strftime('%Y/%m/%d %H:%M:%S.%f', time.gmtime(int(message.timestamp)/1000.))), 'value': str(message.value)} 
+        contents = {'topic': str(message.topic), 'timestamp': message.timestamp, 'value': str(message.value)} 
         if not contents:
             break
         if i == 0:
