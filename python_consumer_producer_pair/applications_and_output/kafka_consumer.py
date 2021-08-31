@@ -32,7 +32,7 @@ with open('output_consumer', 'w', buffering=1) as redf:
     i = 0
     for message in consumer:
         time = datetime.timestamp(datetime.now())
-        contents = {'topic': str(message.topic), 'timestamp': message.timestamp, 'value': str(message.value)} 
+        contents = {'topic': str(message.topic), 'timestamp': str(message.timestamp), 'value': str(message.value)} 
         if not contents:
             break
         if i == 0:
@@ -42,4 +42,4 @@ with open('output_consumer', 'w', buffering=1) as redf:
         # docker takes waaay too long to do this stuff
         time_passage = int(message.timestamp) - int(first_message_timestamp)
         redf.write(f'{message.topic},{message.timestamp},{message.value},{time_passage} \n')
-        print(f'{contents},{time}')
+        print(f'{contents},\'conumer_time:\'{time}')
