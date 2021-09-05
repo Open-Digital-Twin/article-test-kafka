@@ -5,7 +5,7 @@ import random
 from time import sleep
 from datetime import datetime
 from subprocess import getoutput
-from sys import argv, exit
+from sys import argv, exit, getsizeof
 import time
 if not len(argv) == 4:
     exit('this program requires 3 arguments, first the topic, then server and the port')
@@ -26,20 +26,27 @@ consumer = KafkaConsumer(topic,
                         )
 
 with open('output_consumer', 'w', buffering=1) as redf:
-
+    redf.write('topic, kafka_timestamp, message_value, message_producer_time, message_consumer_time, consumer_produtor_latency, time_passed_since_kafka_timestamp_1, size\n')
     print("Ctrl+c to Stop")
     # Call the producer.send method with a producer-record
     i = 0
     for message in consumer:
         time = datetime.timestamp(datetime.now())
-        contents = {'topic': str(message.topic), 'timestamp': str(message.timestamp), 'value': str(message.value)} 
-        if not contents:
-            break
+        message_value = message.value['value']
+        message_producer_time = message.value['producer_time']
+
         if i == 0:
             first_message_timestamp = message.timestamp
-            i = 1
-        # stuff = getoutput('docker stats 7b0ab8128574 --format \"{{.Name}},{{.CPUPerc}},{{.MemUsage}}\" --no-stream')
-        # docker takes waaay too long to do this stuff
-        time_passage = int(message.timestamp) - int(first_message_timestamp)
-        redf.write(f'{message.topic},{message.timestamp},{message.value},{time_passage} \n')
-        print(f'{contents},\'conumer_time:\'{time}')
+
+        time_passage = (message.timestamp - first_message_timestamp)/1000
+        consumer_produtor_latency = time - message_producer_time
+        contents = f'{message.topic}, {message.timestamp/1000}  , {message_value}          , {message_producer_time}    , {time}    , {consumer_produtor_latency}      ,      {time_passage}                           '
+        redf.write(f'{contents}, {str(getsizeof(message))} \n')
+        print(contents)
+        i += 1
+        if i == 999:
+            redf.close()
+            exit()
+            break
+    exit()
+exit()

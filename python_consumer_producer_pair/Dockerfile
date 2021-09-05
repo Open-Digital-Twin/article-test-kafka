@@ -1,8 +1,7 @@
 FROM python:3.6.8
 
 RUN apt-get update && \
-	apt-get -y install bash git ca-certificates \
-	apt-get install vim
+	apt-get -y install bash git ca-certificates
 
 WORKDIR /usr/src/app
 
