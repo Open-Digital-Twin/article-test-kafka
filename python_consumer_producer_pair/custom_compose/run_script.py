@@ -11,9 +11,15 @@ parser.add_argument("-s", "--swarm", help="If the containers are in a docker-swa
 parser.add_argument("-p", "--producer_destinatary", help="Number of *the* kafka container which the produtor will connect to. I.e to connect to kafka_1, the arg is 1", nargs='?', const=1, type=int, default=1)
 parser.add_argument("-c", "--consumer_origin", help="Number of *the* kafka container which the consumer will connect to. I.e to connect to kafka_1, the arg is 1", nargs='?', const=1, type=int, default=1)
 parser.add_argument("-t", "--topic_name", help="The kafka topic where produtor and consumer will communicate through", nargs='?', const='messages', type=str, default='messages')
-parser.add_argument("-n", "--n_times", help="Runs experiment N times", nargs='?', const=1, type=int, default=1)
+parser.add_argument("-n", "--n_times", help="Runs experiment N times (not yet implemented)", nargs='?', const=1, type=int, default=1)
+parser.add_argument("-o", "--output_number", help="Number the final output_consumer file. It is mutually excluse (and overwrites) --n_times", nargs='?', const=0, type=int, default=0)
 
 args = parser.parse_args()
+
+number = args.n_times
+
+if not args.output_number == 0:
+    number = args.output_number
 
 current_dir = str(getcwd())
 
@@ -40,6 +46,6 @@ for n in range(args.n_times):
         subprocess.run(f"docker exec python_producer_1 bash -c \"python3 kafka_producer.py -t {args.topic_name} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary}\"", shell=True) 
         sleep(2)
         print('waiting for file to be written')
-        sleep(2)
-        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{n+1}", shell=True)
+        sleep(5)
+        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{number}", shell=True)
         print('Extracting the output file "output_consumer"') 
