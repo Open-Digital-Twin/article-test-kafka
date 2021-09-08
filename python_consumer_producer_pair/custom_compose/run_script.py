@@ -35,7 +35,10 @@ for n in range(args.n_times):
         sleep(5)
         print('Initializing producer...')
         subprocess.call(f"docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c \"python3 kafka_producer.py -t {args.topic_name} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary}\"", shell=True) 
-        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{n+1}", shell=True) 
+        sleep(2)
+        print('waiting for file to be written')
+        sleep(2)
+        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{number}", shell=True) 
         print('Extracting the output file "output_consumer"') 
 
     elif args.swarm == 0:
@@ -46,6 +49,6 @@ for n in range(args.n_times):
         subprocess.run(f"docker exec python_producer_1 bash -c \"python3 kafka_producer.py -t {args.topic_name} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary}\"", shell=True) 
         sleep(2)
         print('waiting for file to be written')
-        sleep(5)
+        sleep(2)
         subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{number}", shell=True)
         print('Extracting the output file "output_consumer"') 
