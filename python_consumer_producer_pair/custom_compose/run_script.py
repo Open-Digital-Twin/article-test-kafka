@@ -43,7 +43,7 @@ for n in range(args.n_times):
         sleep(2)
         print('waiting for file to be written')
         sleep(2)
-        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{number}", shell=True) 
+        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{n}", shell=True) 
         print('Extracting the output file "output_consumer"') 
 
     elif args.swarm == 0:
@@ -55,7 +55,7 @@ for n in range(args.n_times):
         sleep(2)
         print('waiting for file to be written')
         sleep(2)
-        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{number}", shell=True)
+        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{n}", shell=True)
         print('Extracting the output file "output_consumer"') 
     
     sleep(args.wait)
