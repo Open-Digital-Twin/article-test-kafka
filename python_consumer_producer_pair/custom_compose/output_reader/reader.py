@@ -33,7 +33,10 @@ x = panda_csv.index
 # mem_usag = mem_tmp2['mem_usage'].str.replace('MiB', '')
 # mem_usag = pd.to_numeric(mem_usag, downcast='float')
 
+experiment_time = panda_csv['message_consumer_time'][panda_csv.index[-1]] - panda_csv['message_producer_time'][panda_csv.index[0]]
 latency_mean = panda_csv['consumer_produtor_latency'].mean()
+total_latency = panda_csv['consumer_produtor_latency'].sum()
+
 # cpu_p_mean = cpu_perc.mean()
 
 # once the file is open, we create the graph
@@ -46,8 +49,16 @@ ax1.set_xlabel('number of measures')
 if not loose_scales:
 	plt.ylim([0, 0.5])
 ax1.set_ylabel('Latency (seconds)', color=color)
-ax1.plot(x, panda_csv['consumer_produtor_latency'], color=color, label=f'Mean latency (seconds): {latency_mean.round(4)} \nTime passed since first kafka timestamp (seconds): %s' % {panda_csv['time_passed_since_kafka_timestamp_1'][panda_csv.index[-1]]})
-plt.legend(loc='upper left')
+
+ax1.plot(x, panda_csv['consumer_produtor_latency'], color=color,
+	label=f"""Mean latency (seconds): {latency_mean.round(4)}
+		Total latency (seconds): {total_latency}
+		Time passed since first kafka timestamp (seconds): {panda_csv['time_passed_since_kafka_timestamp_1'][panda_csv.index[-1]]}
+		First latency {panda_csv['consumer_produtor_latency'][panda_csv.index[0]]}
+		Last latency {panda_csv['consumer_produtor_latency'][panda_csv.index[-1]]}
+		Experiment timelapse {experiment_time}""")
+
+plt.legend(loc='upper right')
 ax1.tick_params(axis='y', labelcolor=color)
 
 # color = 'tab:blue'

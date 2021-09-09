@@ -1,20 +1,24 @@
 from kafka import KafkaConsumer
-from json import loads, dumps
+from json import loads
 from itertools import count
-import random
-from time import sleep
 from datetime import datetime
-from subprocess import getoutput
 from sys import argv, exit, getsizeof
 import time
-if not len(argv) == 4:
-    exit('this program requires 3 arguments, first the topic, then server and the port')
+import argparse
 
-topic = argv[1]
-server = argv[2]
-port = argv[3]
+parser = argparse.ArgumentParser()
 
-index = count()
+parser.add_argument("-t", "--topic", help="kafka topic to get the messages", nargs='?', const='topic', type=str, default='topic')
+parser.add_argument("-s", "--server", help="kafka container to connect", nargs='?', const='kafka_1', type=str, default='kafka_1')
+parser.add_argument("-p", "--server_port", help="Port where the kafka container listens", nargs='?', const='9091', type=str, default='9091')
+parser.add_argument("-n", "--n_messages", help="Sends N messages", nargs='?', const=1000, type=int, default=1000)
+
+args = parser.parse_args()
+
+topic = args.topic
+server = args.server
+port = args.server_port
+number_of_messages = args.n_messages
 
 # Create an instance of the Kafka producer
 consumer = KafkaConsumer(topic,
@@ -44,7 +48,7 @@ with open('output_consumer', 'w', buffering=1) as redf:
         redf.write(f'{contents}, {str(getsizeof(message))} \n')
         print(contents)
         i += 1
-        if i == 999:
+        if i == (number_of_messages - 1):
             redf.close()
             exit()
             break

@@ -1,9 +1,9 @@
 from kafka import KafkaProducer
-from json import loads, dumps
+from json import dumps
 import random
 from time import sleep
 from datetime import datetime
-from sys import exit, getsizeof
+from sys import getsizeof
 import argparse
 
 parser = argparse.ArgumentParser()
