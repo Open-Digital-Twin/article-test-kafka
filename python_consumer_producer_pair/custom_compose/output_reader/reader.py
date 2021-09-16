@@ -9,6 +9,7 @@ parser.add_argument("-f", "--file", help="File to be open", nargs='?', type=str)
 # -k 2 -p 1 -c 2
 parser.add_argument("-s", "--scale_loose", help="(0/1) If 1, the scale size of the graph will be defined by the highest value", nargs='?', const=False, type=bool, default=False)
 parser.add_argument("-n", "--n_times", help="Runs experiment N times", nargs='?', const=1, type=int, default=1)
+parser.add_argument("-p", "--print", help="Save graph as png", nargs='?', const='', type=str, default='')
 
 args = parser.parse_args()
 
@@ -17,9 +18,10 @@ args = parser.parse_args()
 
 file_path = str(pathlib.Path(__file__).parent.absolute())
 file_path = file_path.replace('output_reader','')
-
-file_to_open = args.file
+file_to_open = str(args.file)
+file_to_open = file_to_open.strip()
 loose_scales = args.scale_loose
+
 
 panda_csv = pd.read_csv(file_path + file_to_open, skiprows= 1, usecols=[1,3,4,5,6], names=['kafka_timestamp', 'message_producer_time', 'message_consumer_time', 'consumer_produtor_latency', 'time_passed_since_kafka_timestamp_1'])
 
@@ -47,16 +49,16 @@ graph, ax1 = plt.subplots()
 color = 'tab:green'
 ax1.set_xlabel('number of measures')
 if not loose_scales:
-	plt.ylim([0, 0.5])
+    plt.ylim([0, 0.5])
 ax1.set_ylabel('Latency (seconds)', color=color)
 
 ax1.plot(x, panda_csv['consumer_produtor_latency'], color=color,
-	label=f"""Mean latency (seconds): {latency_mean.round(4)}
-		Total latency (seconds): {total_latency}
-		Time passed since first kafka timestamp (seconds): {panda_csv['time_passed_since_kafka_timestamp_1'][panda_csv.index[-1]]}
-		First latency {panda_csv['consumer_produtor_latency'][panda_csv.index[0]]}
-		Last latency {panda_csv['consumer_produtor_latency'][panda_csv.index[-1]]}
-		Experiment timelapse {experiment_time}""")
+    label=f"""Mean latency (seconds): {latency_mean.round(4)}
+        Total latency (seconds): {total_latency}
+        Time passed since first kafka timestamp (seconds): {panda_csv['time_passed_since_kafka_timestamp_1'][panda_csv.index[-1]]}
+        First latency {panda_csv['consumer_produtor_latency'][panda_csv.index[0]]}
+        Last latency {panda_csv['consumer_produtor_latency'][panda_csv.index[-1]]}
+        Experiment timelapse {experiment_time}""")
 
 plt.legend(loc='upper right')
 ax1.tick_params(axis='y', labelcolor=color)
@@ -71,5 +73,13 @@ ax1.tick_params(axis='y', labelcolor=color)
 # ax2.tick_params(axis='y', labelcolor=color)
 
 graph.tight_layout()  # otherwise the right y-label is slightly clipped
-plt.show()
+if len(args.print) > 0:
+    file_to_print = str(args.print)
+    file_to_print = file_to_print.strip()
+    out = str(file_path+file_to_print)
+    print(f'"{out}"')
+    plt.savefig(out)
+    plt.close()
+else:
+    plt.show()
 

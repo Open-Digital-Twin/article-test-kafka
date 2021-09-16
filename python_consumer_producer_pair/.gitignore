@@ -1,3 +1,5 @@
 output_consumer_*
+ output_consumer_*.png
 *.csv
-experiment_*
+docker_stats
+experiment_1000m*

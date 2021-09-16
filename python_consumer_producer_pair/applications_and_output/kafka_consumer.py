@@ -5,7 +5,7 @@ from datetime import datetime
 from sys import argv, exit, getsizeof
 import time
 import argparse
-
+import objsize
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-t", "--topic", help="kafka topic to get the messages", nargs='?', const='topic', type=str, default='topic')
@@ -36,16 +36,16 @@ with open('output_consumer', 'w', buffering=1) as redf:
     i = 0
     for message in consumer:
         time = datetime.timestamp(datetime.now())
-        message_value = message.value['value']
         message_producer_time = message.value['producer_time']
-
+        consumer_produtor_latency = time - message_producer_time
+        
+        message_value = message.value['value']
         if i == 0:
             first_message_timestamp = message.timestamp
 
         time_passage = (message.timestamp - first_message_timestamp)/1000
-        consumer_produtor_latency = time - message_producer_time
         contents = f'{message.topic}, {message.timestamp/1000}  , {message_value}          , {message_producer_time}    , {time}    , {consumer_produtor_latency}      ,      {time_passage}                           '
-        redf.write(f'{contents}, {str(getsizeof(message))} \n')
+        redf.write(f'{contents}, {str(objsize.get_deep_size(message))} \n')
         print(contents)
         i += 1
         if i == (number_of_messages - 1):
