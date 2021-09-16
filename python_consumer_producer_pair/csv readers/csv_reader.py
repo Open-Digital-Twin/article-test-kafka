@@ -17,7 +17,7 @@ if len(argv) == 3:
 if len(argv) > 3:
 	exit('too many arguments')
 
-panda_csv = pd.read_csv(file_path + file_to_open + '.csv', usecols=[1,2], names=['cpu_%', 'mem_usage / limit'])
+panda_csv = pd.read_csv(file_path + file_to_open, usecols=[1,2], names=['cpu_%', 'mem_usage / limit'])
 
 x = panda_csv.index
 cpu_perc = panda_csv['cpu_%'].str.replace('%', '')
