@@ -17,7 +17,7 @@ services:
       replicas: 1
       placement:    
         constraints:
-          - node.labels.name==dtwins2
+          - node.labels.name==dtwins1
 
   kafka_1:
     container_name: kafka_1
@@ -69,7 +69,7 @@ services:
       replicas: 1
       placement:    
         constraints:
-          - node.labels.name==dtwins1
+          - node.labels.name==dtwins2
 
 networks:
   kafka_net:
