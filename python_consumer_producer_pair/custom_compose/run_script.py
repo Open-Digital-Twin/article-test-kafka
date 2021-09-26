@@ -67,7 +67,7 @@ for n in range(args.n_times):
         stdout, stderr = process.communicate()
         print(stdout)
         print(stderr)
-        subprocess.call(f"docker exec {stdout} bash -c \"python3 kafka_producer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
+        subprocess.call(f"docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c \"python3 kafka_producer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
         sleep(2)
         print('waiting for file to be written')
         sleep(2)
