@@ -1,4 +1,4 @@
-FROM python:3.6.8
+FROM python:3.7.12-slim
 
 RUN apt-get update && \
 	apt-get -y install bash git ca-certificates
@@ -11,4 +11,3 @@ RUN pip3 install --no-cache -r requirements.txt
 
 COPY /applications_and_output/kafka_producer.py kafka_producer.py
 COPY /applications_and_output/kafka_consumer.py kafka_consumer.py
-
