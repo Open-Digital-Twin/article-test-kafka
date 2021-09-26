@@ -1,4 +1,4 @@
-FROM python:3.7.12-slim
+FROM python:3.6.15-slim
 
 RUN apt-get update && \
 	apt-get -y install bash git ca-certificates
