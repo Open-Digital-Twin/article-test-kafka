@@ -3,3 +3,7 @@ output_consumer_*
 *.csv
 docker_stats
 experiment_1000m*
+.env
+settings.yaml
+client_secrets.json
+credentials.json

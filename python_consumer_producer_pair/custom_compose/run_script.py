@@ -5,7 +5,7 @@ import argparse
 from time import sleep
 from os import getcwd
 import threading
-
+from fileupload.fileupload import gdrive_upload
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-s", "--swarm", help="If the containers are in a docker-swarm (instanciated as services) or not (0 or 1)", nargs='?', const=1, type=int, default=1)
@@ -13,12 +13,13 @@ parser.add_argument("-s", "--swarm", help="If the containers are in a docker-swa
 parser.add_argument("-p", "--producer_destinatary", help="Number of *the* kafka container which the produtor will connect to. I.e to connect to kafka_1, the arg is 1", nargs='?', const=1, type=int, default=1)
 parser.add_argument("-c", "--consumer_origin", help="Number of *the* kafka container which the consumer will connect to. I.e to connect to kafka_1, the arg is 1", nargs='?', const=1, type=int, default=1)
 parser.add_argument("-t", "--topic_name", help="The kafka topic where produtor and consumer will communicate through", nargs='?', const='messages', type=str, default='messages')
-parser.add_argument("-n", "--n_times", help="Runs experiment N times (not yet implemented)", nargs='?', const=1, type=int, default=1)
+parser.add_argument("-n", "--n_times", help="Runs experiment N times", nargs='?', const=1, type=int, default=1)
 parser.add_argument("-o", "--output_number", help="Number the final output_consumer file. It is mutually excluse (and overwrites) --n_times", nargs='?', const=0, type=int, default=0)
 parser.add_argument("-m", "--messages_to_send", help="Amount of messages sent per test iteration (in the thousands) i.e 100 is 100.000 messages (default 1000)", nargs='?', const=1, type=int, default=1)
-parser.add_argument("-w", "--wait", help="Waiting time between test iterations (default 10)", nargs='?', const=1, type=int, default=1)
+parser.add_argument("-w", "--wait", help="Waiting time between test iterations (default 1)", nargs='?', const=1, type=int, default=1)
 parser.add_argument("-l", "--latency", help="Waiting time beetween messages", nargs='?', const=0.0001, type=float, default=0.0001)
 parser.add_argument("-e", "--entries", help="Entries additional to the original dictionary (makes the message bigger)", nargs='?', const=0, type=int, default=0)
+parser.add_argument("-u", "--upload_to_gdrive", help="When 'true', uploads the experiment output file to the google drive (if configurated)", nargs='?', const='false', type=str, default='false')
 
 args = parser.parse_args()
 
@@ -45,7 +46,13 @@ def stats_thread(swarm):
 ex_uid = randint(1, 9999)
 x = threading.Thread(target=stats_thread, args=(args.swarm,), daemon=True)
 list_of_files = ['tar', 'cf']
-list_of_files.append(f'experiment_{ex_uid}.tar')
+
+if args.swarm != 0:
+    tar_name = f'swarm_experiment_{ex_uid}.tar'
+else:
+    tar_name = f'compose_experiment_{ex_uid}.tar'
+
+list_of_files.append(tar_name)
 
 
 for n in range(args.n_times):
@@ -58,26 +65,19 @@ for n in range(args.n_times):
         subprocess.call(f"docker exec -d $(docker ps -q -f name=kafka_python_consumer_1) bash -c \"python3 kafka_consumer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}\"", shell=True)
         sleep(5)
         print('Initializing producer...')
-        command = ['docker', 'ps', '-q', '-f', 'name=kafka_python_producer_1']
-        process = subprocess.Popen(command,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE,
-                         universal_newlines=True)
-
-        stdout, stderr = process.communicate()
-        print(stdout)
-        print(stderr)
         subprocess.call(f"docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c \"python3 kafka_producer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
         sleep(2)
         print('waiting for file to be written')
-        sleep(2)
-        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}", shell=True) 
-        print('Extracting the output file "output_consumer"') 
-        print(f'Extracting the output file to "output_consumer_{uid}_{n+1}"') 
+        sleep(3)
+        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}.txt", shell=True) 
+        print('Extracting the output file "output_consumers"') 
+        print(f'Extracting the output file to "output_consumer_{uid}_{n+1}.txt"') 
         print(f'Saving graph into "output_consumer_{uid}_{n+1}.png"')
-        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}", f"-p output_consumer_{uid}_{n+1}.png"]) 
-        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}", f"-p output_consumer_{uid}_{n+1}_free_scales.png", "-s True"]) 
-        list_of_files.append(f'output_consumer_{uid}_{n+1}')
+        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}.txt", f"-p output_consumer_{uid}_{n+1}.png"]) 
+        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}.txt", f"-p output_consumer_{uid}_{n+1}_free_scales.png", "-s True"]) 
+        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}.txt", shell=True) 
+
+        list_of_files.append(f'output_consumer_{uid}_{n+1}.txt')
         list_of_files.append(f'output_consumer_{uid}_{n+1}.png')
         list_of_files.append(f'output_consumer_{uid}_{n+1}_free_scales.png')
 
@@ -92,12 +92,15 @@ for n in range(args.n_times):
         sleep(1)
         print('Waiting for file to be written')
         sleep(2)
-        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}", shell=True)
-        print(f'Extracting the output file to "output_consumer_{uid}_{n+1}"') 
+        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}.txt", shell=True)
+        print(f'Extracting the output file to "output_consumer_{uid}_{n+1}.txt"') 
         print(f'Saving graph into "output_consumer_{uid}_{n+1}.png"')
-        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}", f"-p output_consumer_{uid}_{n+1}.png"]) 
-        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}", f"-p output_consumer_{uid}_{n+1}_free_scales.png", "-s True"]) 
-        list_of_files.append(f'output_consumer_{uid}_{n+1}')
+        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}.txt", shell=True)
+        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}.txt", f"-p output_consumer_{uid}_{n+1}.png"]) 
+        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}.txt", f"-p output_consumer_{uid}_{n+1}_free_scales.png", "-s True"]) 
+
+
+        list_of_files.append(f'output_consumer_{uid}_{n+1}.txt')
         list_of_files.append(f'output_consumer_{uid}_{n+1}.png')
         list_of_files.append(f'output_consumer_{uid}_{n+1}_free_scales.png')
 
@@ -108,10 +111,10 @@ sleep(2)
 print('zipping all iterations into one file..')
 
 experiment_settings = str(args).replace('Namespace','Settings')
-with open(f'experiment_{ex_uid}_settings', 'w') as redf:
+with open(f'experiment_{ex_uid}_settings.txt', 'w') as redf:
     redf.write(experiment_settings)
 redf.close()
-list_of_files.append(f'experiment_{ex_uid}_settings')
+list_of_files.append(f'experiment_{ex_uid}_settings.txt')
 
 
 print(list_of_files)
@@ -124,3 +127,7 @@ print(list_of_files)
 
 subprocess.run(list_of_files)
 
+if args.upload_to_gdrive:
+    print('Uploading file to google cloud (for now this removes file from the folder)')
+    gdrive_upload(path_to_file=tar_name)
+    subprocess.run(['rm', tar_name])
