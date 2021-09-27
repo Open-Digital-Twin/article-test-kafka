@@ -41,5 +41,6 @@ for i in range(number_of_messages):
     data['value'] = str(random.randint(100,999))
     data['producer_time'] = datetime.timestamp(datetime.now())
     producer.send(topic, data)
-    print(f'data: {data}, size:{objsize.get_deep_size(data)}')
+    #print(f'data: {data}, size:{objsize.get_deep_size(data)}')
+    print(f'message_number: {i}')
     sleep(delay)
