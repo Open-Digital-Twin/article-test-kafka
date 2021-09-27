@@ -42,5 +42,7 @@ for i in range(number_of_messages):
     data['producer_time'] = datetime.timestamp(datetime.now())
     producer.send(topic, data)
     #print(f'data: {data}, size:{objsize.get_deep_size(data)}')
-    print(f'message_number: {i}')
+    progress = (i/number_of_messages) * 100
+    if progress in (25, 50, 75, 100):
+        print(f'progress: {progress}%')
     sleep(delay)
