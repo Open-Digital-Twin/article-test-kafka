@@ -46,7 +46,7 @@ with open('output_consumer', 'w', buffering=1) as redf:
         time_passage = (message.timestamp - first_message_timestamp)/1000
         contents = f'{message.topic}, {message.timestamp/1000}  , {message_value}          , {message_producer_time}    , {time}    , {consumer_produtor_latency}      ,      {time_passage}                           '
         redf.write(f'{contents}, {str(objsize.get_deep_size(message))} \n')
-        print(contents)
+        print(f'message_number: {i}')
         i += 1
         if i == (number_of_messages - 1):
             redf.close()
