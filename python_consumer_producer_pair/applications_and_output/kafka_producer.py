@@ -43,6 +43,6 @@ for i in range(number_of_messages):
     producer.send(topic, data)
     #print(f'data: {data}, size:{objsize.get_deep_size(data)}')
     progress = (i/number_of_messages) * 100
-    if progress in (25, 50, 75, 100):
+    if progress in range(101):
         print(f'progress: {progress}%')
     sleep(delay)
