@@ -6,6 +6,7 @@ from time import sleep
 from os import getcwd
 import threading
 from fileupload.fileupload import gdrive_upload
+from docker_stats_reader.csv_reader import save_stats_graph
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-s", "--swarm", help="If the containers are in a docker-swarm (instanciated as services) or not (0 or 1)", nargs='?', const=1, type=int, default=1)
@@ -84,6 +85,8 @@ for n in range(args.n_times):
         f = open(f'stats_kafka_{uid}_{n+1}.txt', 'w')
         f.write(stats_stdout)
         f.close()
+        save_stats_graph(current_dir, f'stats_kafka_{uid}_{n+1}.txt', f'stats_kafka_{uid}_{n+1}.png', False)
+        save_stats_graph(current_dir, f'stats_kafka_{uid}_{n+1}.txt', f'stats_kafka_{uid}_{n+1}_free_scales.png', True)
         list_of_files.append(f'stats_kafka_{uid}_{n+1}.txt')
         list_of_files.append(f'output_consumer_{uid}_{n+1}.txt')
         list_of_files.append(f'output_consumer_{uid}_{n+1}.png')
