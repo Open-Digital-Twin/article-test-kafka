@@ -62,7 +62,7 @@ for n in range(args.n_times):
     if args.swarm == 1:
         container = subprocess.Popen(['docker', '-H', 'dtwins2', 'ps', '-q', '-f', 'name=kafka_kafka_1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         container_stdout, container_stderr = container.communicate()
-        docker_stats = subprocess.Popen(['docker', '-H dtwins2', 'stats', container_stdout, '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        docker_stats = subprocess.Popen(['docker', '-H dtwins2', 'stats', container_stdout.replace('\n',''), '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         print('Initializing consumer...')
         subprocess.call(f"docker exec -d $(docker ps -q -f name=kafka_python_consumer_1) bash -c \"python3 kafka_consumer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}\"", shell=True)
         sleep(5)
