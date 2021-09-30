@@ -1,21 +1,4 @@
 import pandas as pd
-from sys import argv, exit
-import pathlib
-
-file_path = str(pathlib.Path(__file__).parent.absolute())
-file_path = file_path.replace('csv readers','')
-
-loose_scales = False
-
-if len(argv) == 1:
-    print("no file_to_open passed as argv")
-if len(argv) == 2:
-    file_to_open = argv[1]
-if len(argv) == 3:
-    file_to_open = argv[1]
-    loose_scales = argv[2]
-if len(argv) > 3:
-    exit('too many arguments')
 
 def save_stats_graph(file_path, file_to_open, file_to_save, loose_scales):
 
