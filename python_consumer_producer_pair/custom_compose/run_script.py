@@ -88,6 +88,8 @@ for n in range(args.n_times):
         save_stats_graph(current_dir, f'stats_kafka_{uid}_{n+1}.txt', f'stats_kafka_{uid}_{n+1}.png', False)
         save_stats_graph(current_dir, f'stats_kafka_{uid}_{n+1}.txt', f'stats_kafka_{uid}_{n+1}_free_scales.png', True)
         list_of_files.append(f'stats_kafka_{uid}_{n+1}.txt')
+        list_of_files.append(f'stats_kafka_{uid}_{n+1}.png')
+        list_of_files.append(f'stats_kafka_{uid}_{n+1}_free_scales.png')
         list_of_files.append(f'output_consumer_{uid}_{n+1}.txt')
         list_of_files.append(f'output_consumer_{uid}_{n+1}.png')
         list_of_files.append(f'output_consumer_{uid}_{n+1}_free_scales.png')
