@@ -12,6 +12,7 @@ def save_stats_graph(file_path, file_to_open, file_to_save, loose_scales):
                                     columns = ['mem_usage','limit'], index = panda_csv.index)
 
     mem_usag = mem_tmp2['mem_usage'].str.replace('MiB', '')
+    mem_usag = mem_tmp2['mem_usage'].str.replace('GiB', '')
     mem_usag = pd.to_numeric(mem_usag, downcast='float')
 
     usage_mean = mem_usag.mean()
