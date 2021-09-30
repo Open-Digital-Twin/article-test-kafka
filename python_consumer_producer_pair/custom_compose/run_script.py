@@ -60,7 +60,7 @@ for n in range(args.n_times):
     print(f'Experiment uid {ex_uid} ...\n')
     uid = randint(1, 999)
     if args.swarm == 1:
-        container = subprocess.run(['docker', '-H', 'dtwins2', 'ps', '-q', '-f', 'name=kafka_kafka_1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        container = subprocess.Popen(['docker', '-H', 'dtwins2', 'ps', '-q', '-f', 'name=kafka_kafka_1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         container_stdout, container_stderr = container.communicate()
         docker_stats = subprocess.Popen(['docker', '-H dtwins2', 'stats', container_stdout, '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         print('Initializing consumer...')
