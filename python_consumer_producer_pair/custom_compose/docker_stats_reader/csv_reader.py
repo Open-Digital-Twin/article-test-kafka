@@ -1,7 +1,7 @@
 import pandas as pd
 
 def save_stats_graph(file_path, file_to_open, file_to_save, loose_scales):
-
+    file_path = f'{file_path}/'
     panda_csv = pd.read_csv(file_path + file_to_open, usecols=[1,2], names=['cpu_%', 'mem_usage / limit'])
 
     x = panda_csv.index
