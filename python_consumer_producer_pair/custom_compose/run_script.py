@@ -6,7 +6,7 @@ from time import sleep
 from os import getcwd
 import threading
 from fileupload.fileupload import gdrive_upload
-from docker_stats_reader.csv_reader import save_stats_graph
+from auxiliary_functions.save_n_read_data import save_docker_stats, container_stats_target
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-s", "--swarm", help="If the containers are in a docker-swarm (instanciated as services) or not (0 or 1)", nargs='?', const=1, type=int, default=1)
@@ -36,16 +36,7 @@ if not args.swarm in (0,1):
     print('\n - Invalid value for swarm argument')
     exit() 
 
-def stats_thread(swarm):
-    docker_stats = subprocess.run(['docker stats','kafka_1' ,'--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"', '>> docker_stats_out'])
-    if swarm == 1:
-        docker_stats = subprocess.run(['docker stats', '$(docker ps -q -f name=kafka_kafka_1)' , '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"', '>> docker_stats_out'],
-                            shell=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            universal_newlines=True)
 ex_uid = randint(1, 9999)
-x = threading.Thread(target=stats_thread, args=(args.swarm,), daemon=True)
 list_of_files = ['tar', 'cf']
 
 if args.swarm != 0:
@@ -60,68 +51,66 @@ for n in range(args.n_times):
     print(f'\n\nStarting iteration {n+1} ...\n')
     print(f'Experiment uid {ex_uid} ...\n')
     uid = randint(1, 999)
+    iteration_code = f'{n+1}_{uid}'
     if args.swarm == 1:
-        container = subprocess.Popen(['docker', '-H', 'dtwins2', 'ps', '-q', '-f', 'name=kafka_kafka_1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-        container_stdout, container_stderr = container.communicate()
-        container_stdout = container_stdout.replace('\n','')
-        docker_stats = subprocess.Popen(['docker', '-H dtwins2', 'stats', container_stdout, '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        print('Preparing to save docker stats..')
+        container_id = container_stats_target('dtwins2', 'kafka_kafka_1')
+        docker_stats = subprocess.Popen(['docker', '-H dtwins2', 'stats', container_id, '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        
         print('Initializing consumer...')
-        subprocess.call(f"docker exec -d $(docker ps -q -f name=kafka_python_consumer_1) bash -c \"python3 kafka_consumer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}\"", shell=True)
+        intern_bash_command = f'python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}'
+        subprocess.call(f'docker exec -d $(docker ps -q -f name=kafka_python_consumer_1) bash -c "{intern_bash_command}"', shell=True)
         sleep(5)
+
         print('Initializing producer...')
-        subprocess.call(f"docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c \"python3 kafka_producer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
-        sleep(2)
-        print('waiting for file to be written')
-        sleep(3)
-        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}.txt", shell=True) 
-        print('Extracting the output file "output_consumers"') 
-        print(f'Extracting the output file to "output_consumer_{uid}_{n+1}.txt"') 
-        print(f'Saving graph into "output_consumer_{uid}_{n+1}.png"')
-        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}.txt", f"-p output_consumer_{uid}_{n+1}.png"]) 
-        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}.txt", f"-p output_consumer_{uid}_{n+1}_free_scales.png", "-s True"]) 
-        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}.txt", shell=True) 
+        intern_bash_command = f'python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}'
+        subprocess.call(f'docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c "{intern_bash_command}"', shell=True)
+        print('Waiting for output file to be written')
+        sleep(5)
+
+        print(f'Copying the output file to "output_consumer_{iteration_code}.txt"') 
+        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{iteration_code}.txt", shell=True) 
+        
+        print(f'Saving graph into "output_consumer_{iteration_code}.png"')
+        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{iteration_code}.txt", f"-p output_consumer_{iteration_code}.png"]) 
+        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{iteration_code}.txt", f"-p output_consumer_{iteration_code}_free_scales.png", "-s True"])
+
+        print('Saving docker stats of the experiment..') 
         docker_stats.kill()
         stats_stdout , stats_stderr = docker_stats.communicate()
-        f = open(f'stats_kafka_{uid}_{n+1}.txt', 'w')
-        f.write(stats_stdout)
-        f.close()
-        save_stats_graph(current_dir, f'stats_kafka_{uid}_{n+1}.txt', f'stats_kafka_{uid}_{n+1}.png', False)
-        save_stats_graph(current_dir, f'stats_kafka_{uid}_{n+1}.txt', f'stats_kafka_{uid}_{n+1}_free_scales.png', True)
-        list_of_files.append(f'stats_kafka_{uid}_{n+1}.txt')
-        list_of_files.append(f'stats_kafka_{uid}_{n+1}.png')
-        list_of_files.append(f'stats_kafka_{uid}_{n+1}_free_scales.png')
-        list_of_files.append(f'output_consumer_{uid}_{n+1}.txt')
-        list_of_files.append(f'output_consumer_{uid}_{n+1}.png')
-        list_of_files.append(f'output_consumer_{uid}_{n+1}_free_scales.png')
+        stats_files = save_docker_stats(iteration_code, stats_stdout, current_dir)
 
+        print('Adding new files to the experiment list of files..')
+        new_files = [f'output_consumer_{iteration_code}.txt', f'output_consumer_{iteration_code}.png', f'output_consumer_{iteration_code}_free_scales.png'] + stats_files
+        list_of_files += new_files
         print('done!')
 
     elif args.swarm == 0:
         print('Initializing consumer...')
-        subprocess.run(f"docker exec -d python_consumer_1 bash -c \"python3 kafka_consumer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}\"", shell=True) 
+        subprocess.run(f"docker exec -d python_consumer_1 bash -c \"python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}\"", shell=True) 
         sleep(5)
         print('Initializing producer...')
-        subprocess.run(f"docker exec python_producer_1 bash -c \"python3 kafka_producer.py -t {args.topic_name}_{uid}_{n+1} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
+        subprocess.run(f"docker exec python_producer_1 bash -c \"python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
         sleep(1)
         print('Waiting for file to be written')
         sleep(2)
-        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}.txt", shell=True)
-        print(f'Extracting the output file to "output_consumer_{uid}_{n+1}.txt"') 
-        print(f'Saving graph into "output_consumer_{uid}_{n+1}.png"')
-        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{uid}_{n+1}.txt", shell=True)
-        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}.txt", f"-p output_consumer_{uid}_{n+1}.png"]) 
-        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{uid}_{n+1}.txt", f"-p output_consumer_{uid}_{n+1}_free_scales.png", "-s True"]) 
+        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{iteration_code}.txt", shell=True)
+        print(f'Extracting the output file to "output_consumer_{iteration_code}.txt"') 
+        print(f'Saving graph into "output_consumer_{iteration_code}.png"')
+        subprocess.run(f"docker cp python_consumer_1:/usr/src/app/output_consumer {current_dir}/output_consumer_{iteration_code}.txt", shell=True)
+        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{iteration_code}.txt", f"-p output_consumer_{iteration_code}.png"]) 
+        subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{iteration_code}.txt", f"-p output_consumer_{iteration_code}_free_scales.png", "-s True"]) 
 
 
-        list_of_files.append(f'output_consumer_{uid}_{n+1}.txt')
-        list_of_files.append(f'output_consumer_{uid}_{n+1}.png')
-        list_of_files.append(f'output_consumer_{uid}_{n+1}_free_scales.png')
+        list_of_files.append(f'output_consumer_{iteration_code}.txt')
+        list_of_files.append(f'output_consumer_{iteration_code}.png')
+        list_of_files.append(f'output_consumer_{iteration_code}_free_scales.png')
 
         print(f'done! experiment_{uid}')
 
     sleep(args.wait)
 sleep(2)
-print('zipping all iterations into one file..')
+print('zipping all iterations files into one tar..')
 
 experiment_settings = str(args).replace('Namespace','Settings')
 with open(f'experiment_{ex_uid}_settings.txt', 'w') as redf:
