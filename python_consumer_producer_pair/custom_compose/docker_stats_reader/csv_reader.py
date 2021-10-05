@@ -11,11 +11,10 @@ def save_stats_graph(file_path, file_to_open, file_to_save, loose_scales):
     mem_tmp2 = pd.DataFrame(panda_csv['mem_usage / limit'].str.split('/',1).tolist(),
                                     columns = ['mem_usage','limit'], index = panda_csv.index)
 
-    if 'GiB' in mem_tmp2['mem_usage']:
-        mem_usag = mem_tmp2['mem_usage'].str.replace('GiB', '')
-    elif 'MiB' in mem_tmp2['mem_usage']:
-        mem_usag = mem_tmp2['mem_usage'].str.replace('MiB', '')
-        
+    
+    mem_tmp2['mem_usage'] = mem_tmp2['mem_usage'].str.replace('GiB', '')
+    mem_usag = mem_tmp2['mem_usage'].str.replace('MiB', '')
+
     mem_usag = pd.to_numeric(mem_usag, downcast='float')
 
     usage_mean = mem_usag.mean()
