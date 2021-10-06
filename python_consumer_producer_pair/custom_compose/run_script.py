@@ -62,7 +62,7 @@ for n in range(args.n_times):
 
         print('Initializing producer...')
         intern_bash_command = f'python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}'
-        subprocess.call(f'docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c "{intern_bash_command}"', shell=True)
+        producer = subprocess.Popen(f'docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c "{intern_bash_command}"', shell=True)
         print('Waiting for output file to be written')
         sleep(10)
 
@@ -83,6 +83,9 @@ for n in range(args.n_times):
         list_of_files += new_files
         print('done!')
         consumer.kill()
+        sleep(1)
+        producer.kill()
+        sleep(1)
 
     elif args.swarm == 0:
         print('Initializing consumer...')
