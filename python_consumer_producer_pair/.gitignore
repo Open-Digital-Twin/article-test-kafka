@@ -7,3 +7,5 @@ experiment_1000m*
 settings.yaml
 client_secrets.json
 credentials.json
+__pycache__
+*.old

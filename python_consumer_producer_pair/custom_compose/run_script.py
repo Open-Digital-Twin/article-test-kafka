@@ -4,7 +4,6 @@ import subprocess
 import argparse
 from time import sleep
 from os import getcwd
-import threading
 from fileupload.fileupload import gdrive_upload
 from auxiliary_functions.save_n_read_data import save_docker_stats, container_stats_target
 parser = argparse.ArgumentParser()
@@ -50,8 +49,7 @@ list_of_files.append(tar_name)
 for n in range(args.n_times):
     print(f'\n\nStarting iteration {n+1} ...\n')
     print(f'Experiment uid {ex_uid} ...\n')
-    uid = randint(1, 999)
-    iteration_code = f'{n+1}_{uid}'
+    iteration_code = f'{n+1}_{ex_uid}'
     if args.swarm == 1:
         print('Preparing to save docker stats..')
         container_id = container_stats_target('dtwins2', 'kafka_kafka_1')
@@ -106,7 +104,7 @@ for n in range(args.n_times):
         list_of_files.append(f'output_consumer_{iteration_code}.png')
         list_of_files.append(f'output_consumer_{iteration_code}_free_scales.png')
 
-        print(f'done! experiment_{uid}')
+        print(f'done! experiment_{iteration_code}')
 
     sleep(args.wait)
 sleep(2)
