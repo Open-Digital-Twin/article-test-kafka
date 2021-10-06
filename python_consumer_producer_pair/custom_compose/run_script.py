@@ -62,12 +62,12 @@ for n in range(args.n_times):
 
         print('Initializing producer...')
         intern_bash_command = f'python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}'
-        producer = subprocess.Popen(f'docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c "{intern_bash_command}"', shell=True)
+        subprocess.run(f'docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c "{intern_bash_command}"', shell=True)
         print('Waiting for output file to be written')
         sleep(10)
 
         print(f'Copying the output file to "output_consumer_{iteration_code}.txt"') 
-        subprocess.call(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{iteration_code}.txt", shell=True) 
+        subprocess.run(f"docker cp $(docker ps -q -f name=kafka_python_consumer_1):/usr/src/app/output_consumer {current_dir}/output_consumer_{iteration_code}.txt", shell=True) 
         
         print(f'Saving graph into "output_consumer_{iteration_code}.png"')
         subprocess.run([f"python3", "output_reader/reader.py", f"-f output_consumer_{iteration_code}.txt", f"-p output_consumer_{iteration_code}.png"]) 
@@ -83,9 +83,6 @@ for n in range(args.n_times):
         list_of_files += new_files
         print('done!')
         consumer.kill()
-        sleep(1)
-        producer.kill()
-        sleep(1)
 
     elif args.swarm == 0:
         print('Initializing consumer...')
