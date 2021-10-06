@@ -57,7 +57,7 @@ for n in range(args.n_times):
         
         print('Initializing consumer...')
         intern_bash_command = f'python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}'
-        consumer = subprocess.call(f'docker exec -d $(docker ps -q -f name=kafka_python_consumer_1) bash -c "{intern_bash_command}"', shell=True)
+        consumer = subprocess.call(f'docker exec -d $(docker ps -q -f name=kafka_python_consumer_1) bash -c "{intern_bash_command}"')
         sleep(10)
 
         print('Initializing producer...')
