@@ -33,6 +33,10 @@ data = {}
 
 for i in range(1, (args.entries) + 1):
     data[f'{i}'] = 'justAfixedSizeString'
+timestamp_example = datetime.timestamp(datetime.now())
+value_example = str(random.randint(100,999))
+total_exp_size = (objsize.get_deep_size(data) + objsize.get_deep_size(value_example) + objsize.get_deep_size(timestamp_example)) * number_of_messages
+print(f'experiment size is {total_exp_size} bytes')
 
 # Call the producer.send method with a producer-record
 print("Ctrl+c to Stop")
