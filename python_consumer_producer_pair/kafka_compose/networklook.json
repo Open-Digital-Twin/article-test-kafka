@@ -1,0 +1,138 @@
+[{"adbarros@dtwins1":"~/git/article-test-kafka/python_consumer_producer_pair/kafka_compose$ docker network inspect wurstmeister_net"},
+    {
+        "Name": "wurstmeister_net",
+        "Id": "pq1xdd7yydq05ve7va9aepw3s",
+        "Created": "2021-10-20T09:51:28.663398251Z",
+        "Scope": "swarm",
+        "Driver": "overlay",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "10.0.13.0/24",
+                    "Gateway": "10.0.13.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "1231899ef9e4c640c172f79ce38cf1f72456f105df8178b5e59ad021054f1af6": {
+                "Name": "kafka_python_producer_1.1.tputt6xu9v648hnlr8rmfx0qc",
+                "EndpointID": "f8f640f8b37da3390c050e22a38dc250e29ee402c85dd7bd32a03787bd3441d0",
+                "MacAddress": "02:42:0a:00:0d:09",
+                "IPv4Address": "10.0.13.9/24",
+                "IPv6Address": ""
+            },
+            "add6f9c08b223e9d93eeb1dc9e188e1568b4f2da4a44bb30685b1c2c8be568e7": {
+                "Name": "kafka_kafka.1.r0d1y0kegnegt83xp199wqrtm",
+                "EndpointID": "b163cf1fedaa69dae42d70dafba13a4bd44734ffc3ac2a62ff9f320c697370f4",
+                "MacAddress": "02:42:0a:00:0d:06",
+                "IPv4Address": "10.0.13.6/24",
+                "IPv6Address": ""
+            },
+            "e87b003aeb9577896523b2329fc55ceeb3e30a207bbdeafa975a50d547ff5ac7": {
+                "Name": "kafka_python_consumer_1.1.itph7o8gsa3znus6co85lryy6",
+                "EndpointID": "bbf9d2fe013c49c25c4a639fcf0a4318e316b7872966bd1148c6f88545669fde",
+                "MacAddress": "02:42:0a:00:0d:0b",
+                "IPv4Address": "10.0.13.11/24",
+                "IPv6Address": ""
+            },
+            "lb-wurstmeister_net": {
+                "Name": "wurstmeister_net-endpoint",
+                "EndpointID": "d0876ca3bab4f320ed14ef2eaf61d2e785bbe3fec433cc34bae68e54d9454cff",
+                "MacAddress": "02:42:0a:00:0d:07",
+                "IPv4Address": "10.0.13.7/24",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.driver.overlay.vxlanid_list": "4109"
+        },
+        "Labels": {
+            "com.docker.stack.namespace": "kafka"
+        },
+        "Peers": [
+            {
+                "Name": "23958b7176a1",
+                "IP": "192.168.122.162"
+            },
+            {
+                "Name": "859b0ae2317c",
+                "IP": "192.168.122.17"
+            }
+        ]
+    },
+{"adbarros@dtwins1":"~/git/article-test-kafka/python_consumer_producer_pair/kafka_compose$ docker -H dtwins2 network inspect wurstmeister_net"},
+    {
+        "Name": "wurstmeister_net",
+        "Id": "pq1xdd7yydq05ve7va9aepw3s",
+        "Created": "2021-10-20T09:51:25.240364871Z",
+        "Scope": "swarm",
+        "Driver": "overlay",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "10.0.13.0/24",
+                    "Gateway": "10.0.13.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "1c3fd74f87242657318657aab3cd3e30de167bc083bf99e81adff39e6cff40c1": {
+                "Name": "kafka_zookeeper.1.uw86ovowcqzrl7t6y58ftnfvp",
+                "EndpointID": "6b45fafe762aa1c65e0e366f538c2c5ea4185d9bfdf283521963fd97803d1b15",
+                "MacAddress": "02:42:0a:00:0d:03",
+                "IPv4Address": "10.0.13.3/24",
+                "IPv6Address": ""
+            },
+            "d76d14d1838a5f0a66c0171dd80ff1cda0c740583e084205997a6d77bc11c902": {
+                "Name": "kafka_kafka.2.isqev3qjrvy12a9ouvw98wjgv",
+                "EndpointID": "af0e524935ef552a8d8501ae3f08809a0108b0a5a24dabeed82dcaef1ea85c2c",
+                "MacAddress": "02:42:0a:00:0d:0c",
+                "IPv4Address": "10.0.13.12/24",
+                "IPv6Address": ""
+            },
+            "lb-wurstmeister_net": {
+                "Name": "wurstmeister_net-endpoint",
+                "EndpointID": "e32526404b848032c1493cea93d74931feb4c9eeb324a91c57058d5f5aa979bd",
+                "MacAddress": "02:42:0a:00:0d:04",
+                "IPv4Address": "10.0.13.4/24",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.driver.overlay.vxlanid_list": "4109"
+        },
+        "Labels": {
+            "com.docker.stack.namespace": "kafka"
+        },
+        "Peers": [
+            {
+                "Name": "23958b7176a1",
+                "IP": "192.168.122.162"
+            },
+            {
+                "Name": "859b0ae2317c",
+                "IP": "192.168.122.17"
+            }
+        ]
+    }
+]

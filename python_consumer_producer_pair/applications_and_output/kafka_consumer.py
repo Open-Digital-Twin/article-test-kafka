@@ -48,7 +48,7 @@ with open('output_consumer', 'w', buffering=1) as redf:
         redf.write(f'{contents}, {str(objsize.get_deep_size(message))} \n')
         print(f'message_number: {i}')
         i += 1
-        if i == (number_of_messages - 1):
+        if i == (number_of_messages):
             redf.close()
             exit()
             break
