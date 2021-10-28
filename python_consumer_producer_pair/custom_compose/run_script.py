@@ -56,12 +56,12 @@ for n in range(args.n_times):
         docker_stats = subprocess.Popen(['docker', '-H dtwins2', 'stats', container_id, '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         
         print('Initializing consumer...')
-        intern_bash_command = f'python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}'
+        intern_bash_command = f'python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_kafka -p 9094 -n {ammount_of_messages}'
         consumer = subprocess.Popen(f'docker exec -d $(docker ps -q -f name=kafka_python_consumer_1) bash -c "{intern_bash_command}"', shell=True)
         sleep(10)
 
         print('Initializing producer...')
-        intern_bash_command = f'python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}'
+        intern_bash_command = f'python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_kafka -p 9094 -n {ammount_of_messages} -d {args.latency} -e {args.entries}'
         producer = subprocess.run(f'docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c "{intern_bash_command}"', shell=True)
         print('Waiting for output file to be written')
         sleep(10)
