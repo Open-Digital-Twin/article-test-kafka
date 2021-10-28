@@ -30,7 +30,7 @@ def save_stats_graph(file_path, file_to_open, file_to_save, loose_scales):
     if not loose_scales:
         plt.ylim([0, 600])
     ax1.set_ylabel('memory usage (MiB)', color=color)
-    ax1.plot(x, mem_usag, color=color, label=f'mean memory usage: {usage_mean.round(4)}')
+    ax1.plot(x, mem_usag, color=color, label=f'mean memory usage: {round(usage_mean, 4)}')
     plt.legend(loc='upper left')
     ax1.tick_params(axis='y', labelcolor=color)
 
@@ -39,7 +39,7 @@ def save_stats_graph(file_path, file_to_open, file_to_save, loose_scales):
     ax2.set_ylabel('cpu percentage (%)', color=color)  # we already handled the x-label with ax1
     if not loose_scales:
         plt.ylim([0, 100])
-    ax2.plot(x, cpu_perc, color=color, label=f'mean processor usage: {cpu_p_mean.round(4)}')
+    ax2.plot(x, cpu_perc, color=color, label=f'mean processor usage: {round(cpu_p_mean, 4)}')
     plt.legend(loc='center left')
     ax2.tick_params(axis='y', labelcolor=color)
 
