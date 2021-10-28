@@ -9,7 +9,7 @@ services:
 
   kafka:
     image: wurstmeister/kafka:latest
-    ports:
+    # ports:
       # - target: 9094
       #   published: 9094
         protocol: tcp
