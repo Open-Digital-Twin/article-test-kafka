@@ -9,3 +9,5 @@ client_secrets.json
 credentials.json
 __pycache__
 *.old
+.pyc
+compose_experiment*

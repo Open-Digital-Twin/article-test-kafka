@@ -6,7 +6,7 @@ from os import getcwd
 
 current_directory_for_file_upload = getcwd()
 
-def gdrive_upload(path_to_file= current_directory_for_file_upload + '/file.txt'):
+def gdrive_upload(path_to_file= current_directory_for_file_upload + '/fileupload/file.txt'):
     '''
     this functionality requires you to configure a google drive API, and place the correct tokens and settings in files settings.yaml
     for more read: 

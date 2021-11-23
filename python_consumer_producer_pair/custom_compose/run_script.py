@@ -86,10 +86,10 @@ for n in range(args.n_times):
 
     elif args.swarm == 0:
         print('Initializing consumer...')
-        subprocess.run(f"docker exec -d python_consumer_1 bash -c \"python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.consumer_origin} -n {ammount_of_messages}\"", shell=True) 
+        subprocess.run(f"docker exec -d python_consumer_1 bash -c \"python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 9094 -n {ammount_of_messages}\"", shell=True) 
         sleep(5)
         print('Initializing producer...')
-        subprocess.run(f"docker exec python_producer_1 bash -c \"python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 909{args.producer_destinatary} -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
+        subprocess.run(f"docker exec python_producer_1 bash -c \"python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 9094 -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
         sleep(1)
         print('Waiting for file to be written')
         sleep(2)
@@ -128,7 +128,7 @@ print(list_of_files)
 
 subprocess.run(list_of_files)
 
-if args.upload_to_gdrive:
+if args.upload_to_gdrive == 'true':
     print('Uploading file to google cloud (for now this removes file from the folder)')
     gdrive_upload(path_to_file=tar_name)
     subprocess.run(['rm', tar_name])
