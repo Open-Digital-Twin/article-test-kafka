@@ -10,7 +10,7 @@ parser.add_argument("-n", "--n_messages", help="Sends N messages", nargs='?', co
 
 args = parser.parse_args()
 
-connection = KafkaAdminClient(bootstrap_servers= f'{args.server}:{args.port}')
+connection = KafkaAdminClient(bootstrap_servers= f'{args.server}:{args.server_port}')
 
 topic = NewTopic(name= args.topic, num_partitions= 1, replication_factor= 1)
 new_topic = connection.create_topics([topic])

@@ -50,18 +50,22 @@ for n in range(args.n_times):
     print(f'\n\nStarting iteration {n+1} ...\n')
     print(f'Experiment uid {ex_uid} ...\n')
     iteration_code = f'{n+1}_{ex_uid}'
+    final_topic_name = args.topic_name
+    if args.topic_name == 'messages':
+        final_topic_name = f'{args.topic_name}_{iteration_code}'
+    
     if args.swarm == 1:
         print('Preparing to save docker stats..')
         container_id = container_stats_target('dtwins2', 'kafka_kafka_1')
         docker_stats = subprocess.Popen(['docker', '-H dtwins2', 'stats', container_id, '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         
         print('Initializing consumer...')
-        intern_bash_command = f'python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_kafka -p 9094 -n {ammount_of_messages}'
+        intern_bash_command = f'python3 kafka_consumer.py -t {final_topic_name} -s kafka_kafka -p 9094 -n {ammount_of_messages}'
         consumer = subprocess.Popen(f'docker exec -d $(docker ps -q -f name=kafka_python_consumer_1) bash -c "{intern_bash_command}"', shell=True)
         sleep(10)
 
         print('Initializing producer...')
-        intern_bash_command = f'python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_kafka -p 9094 -n {ammount_of_messages} -d {args.latency} -e {args.entries}'
+        intern_bash_command = f'python3 kafka_producer.py -t {final_topic_name} -s kafka_kafka -p 9094 -n {ammount_of_messages} -d {args.latency} -e {args.entries}'
         producer = subprocess.run(f'docker exec $(docker ps -q -f name=kafka_python_producer_1) bash -c "{intern_bash_command}"', shell=True)
         print('Waiting for output file to be written')
         sleep(10)
@@ -86,10 +90,10 @@ for n in range(args.n_times):
 
     elif args.swarm == 0:
         print('Initializing consumer...')
-        subprocess.run(f"docker exec -d python_consumer_1 bash -c \"python3 kafka_consumer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 9094 -n {ammount_of_messages}\"", shell=True) 
+        subprocess.run(f"docker exec -d python_consumer_1 bash -c \"python3 kafka_consumer.py -t {final_topic_name} -s kafka_{args.consumer_origin} -p 9094 -n {ammount_of_messages}\"", shell=True) 
         sleep(5)
         print('Initializing producer...')
-        subprocess.run(f"docker exec python_producer_1 bash -c \"python3 kafka_producer.py -t {args.topic_name}_{iteration_code} -s kafka_{args.consumer_origin} -p 9094 -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
+        subprocess.run(f"docker exec python_producer_1 bash -c \"python3 kafka_producer.py -t {final_topic_name} -s kafka_{args.consumer_origin} -p 9094 -n {ammount_of_messages} -d {args.latency} -e {args.entries}\"", shell=True) 
         sleep(1)
         print('Waiting for file to be written')
         sleep(2)
