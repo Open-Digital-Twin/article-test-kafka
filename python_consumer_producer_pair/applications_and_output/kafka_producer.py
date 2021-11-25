@@ -45,6 +45,7 @@ for i in range(number_of_messages):
     data['value'] = str(random.randint(100,999))
     data['producer_time'] = datetime.timestamp(datetime.now())
     producer.send(topic, data)
+    if i in (int(number_of_messages * 0.01), int(number_of_messages * 0.1), int(number_of_messages * 0.5), int(number_of_messages * 0.7), int(number_of_messages * 0.9)):
     #print(f'data: {data}, size:{objsize.get_deep_size(data)}')
-    print(f'progress: {i}')
+        print(f'progress: {i} out of {number_of_messages}', '\r')
     sleep(delay)
