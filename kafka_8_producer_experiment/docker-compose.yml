@@ -137,6 +137,7 @@ services:
      kafka_net:
     deploy:
       replicas: 3
+       placement:
         constraints:
           - node.labels.kafka_role==kafka_node
 
