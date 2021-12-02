@@ -140,6 +140,13 @@ services:
     container_name: kafka_1
     image: wurstmeister/kafka:latest
     depends_on:
+     - python_producer_1
+     - python_consumer_1
+     - python_producer_2
+     - python_consumer_2
+     - python_producer_3
+     - python_consumer_3
+     - python_producer_4
      - python_consumer_4
      - zookeeper
     # ports:
