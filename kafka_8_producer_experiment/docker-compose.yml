@@ -19,6 +19,8 @@ services:
     image: python-kafka:latest
     stdin_open: true
     tty: true
+    depends_on:
+     - zookeeper
     networks:
      kafka_net:
     deploy:
@@ -32,6 +34,8 @@ services:
     image: python-kafka:latest
     stdin_open: true
     tty: true
+    depends_on:
+     - python_producer_1
     networks:
      kafka_net:
     deploy:
@@ -45,6 +49,8 @@ services:
     image: python-kafka:latest
     stdin_open: true
     tty: true
+    depends_on:
+     - python_consumer_1
     networks:
      kafka_net:
     deploy:
@@ -58,6 +64,8 @@ services:
     image: python-kafka:latest
     stdin_open: true
     tty: true
+    depends_on:
+     - python_producer_2
     networks:
      kafka_net:
     deploy:
@@ -71,6 +79,8 @@ services:
     image: python-kafka:latest
     stdin_open: true
     tty: true
+    depends_on:
+     - python_consumer_2
     networks:
      kafka_net:
     deploy:
@@ -84,6 +94,8 @@ services:
     image: python-kafka:latest
     stdin_open: true
     tty: true
+    depends_on:
+     - python_producer_3
     networks:
      kafka_net:
     deploy:
@@ -97,6 +109,8 @@ services:
     image: python-kafka:latest
     stdin_open: true
     tty: true
+    depends_on:
+     - python_consumer_3
     networks:
      kafka_net:
     deploy:
@@ -110,6 +124,8 @@ services:
     image: python-kafka:latest
     stdin_open: true
     tty: true
+    depends_on:
+     - python_producer_4
     networks:
      kafka_net:
     deploy:
@@ -123,6 +139,9 @@ services:
   kafka:
     container_name: kafka_1
     image: wurstmeister/kafka:latest
+    depends_on:
+     - python_consumer_4
+     - zookeeper
     # ports:
     #   - target: 9094
     #     published: 9094
