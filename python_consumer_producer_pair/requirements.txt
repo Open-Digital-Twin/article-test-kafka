@@ -2,6 +2,4 @@ lz4
 crc32c
 pandas
 matplotlib
-kafka
-kafka-python
 objsize
