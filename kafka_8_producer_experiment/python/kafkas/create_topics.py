@@ -1,0 +1,35 @@
+from random import randint
+from os import get_terminal_size
+import subprocess
+
+line_width = get_terminal_size().columns
+half_line = int(line_width/2)
+
+def create_topic_per_consumer(consumer_list = [], replication = 1, partition = 1):
+    print('\n' + '-' * (half_line - 9)+ ' Creating topics ' + '-' * (half_line - 8) + '\n')
+    
+    topic_list = []
+    for consumer in consumer_list:
+        print(f'Created topic from {consumer["node"]} of consumer {consumer["consumer"]}')
+        topic_name = f'topic_{consumer["node"]}_{consumer["consumer"]}_{randint(111111111,999999999)}'
+
+        cmd_docker = ['docker', f'-H {consumer["node"]}', 'exec',f'{consumer["consumer"]}']
+        cmd_container = cmd_docker +['python3', 'kafka_topic_creation.py', '-t', topic_name, '-s', 'kafka_kafka', '-p', '9094', '-r', replication, '-n', partition]
+        cmd_string = ' '.join([str(item) for item in cmd_container])
+        consumer_process = subprocess.run(cmd_string, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines= True)
+        print(consumer_process.stdout)
+        print(consumer_process.stderr)
+        topic_list.append({'node': consumer['node'], 'topic':topic_name, 'consumer':consumer['consumer']})
+    
+    print('\n' + '-' * (half_line - 3) + ' End ' + '-' * (half_line - 2) + '\n')
+
+    return topic_list
+
+if __name__ == '__main__':
+    from get_all_nodes_names import get_node_names
+    node_list = get_node_names()
+    from get_container_ids import get_container_structure
+    from docker_stats_consumers import get_docker_stats_consumers
+    machine_list = get_container_structure(node_list)
+    consumer_list = get_docker_stats_consumers(machine_list)
+    create_topic_per_consumer(consumer_list, replication = 3)
