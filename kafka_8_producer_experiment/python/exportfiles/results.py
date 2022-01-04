@@ -1,21 +1,24 @@
 from random import randint
-from os import get_terminal_size, makedirs
+from os import makedirs
 import subprocess
 from time import sleep
 
-line_width = get_terminal_size().columns
-half_line = int(line_width/2)
+from auxiliaryfunctions.terminal import print_centralized
 
 def create_experiment_folder(home_dir = '/home/adbarros'):
+    print_centralized(' Creating experiment folder ')
+
     exp_number = randint(111111111,999999999)
     exp_folder = f'/experiment_{exp_number}'
     makedirs(f'{home_dir}{exp_folder}', exist_ok = True)
     makedirs(f'{home_dir}{exp_folder}/csv', exist_ok = True)
     makedirs(f'{home_dir}{exp_folder}/graphs', exist_ok = True)
+
+    print_centralized(' End ')
     return exp_number
 
 def export_output_files(consumer_list = [], exp_number = 0, home_dir = '/home/adbarros'):
-    print('\n' + '-' * (half_line - 9)+ ' Exporting files ' + '-' * (half_line - 8) + '\n')
+    print_centralized(' Exporting files ')
     app_folder = '/usr/src/app'
     exp_folder = f'/experiment_{exp_number}'
     output_files = []
@@ -29,31 +32,31 @@ def export_output_files(consumer_list = [], exp_number = 0, home_dir = '/home/ad
         print(f'From node {consumer["node"]}, copied consumer {consumer["consumer"]} output, of experiment number {exp_number}')
 
     
-    print('\n' + '-' * (half_line - 3) + ' End ' + '-' * (half_line - 2) + '\n')
+    print_centralized(' End ')
     return output_files
 
 if __name__ == '__main__':
-    from get_all_nodes_names import get_node_names
+    from networkstructure.nodes import get_node_names
     node_list = get_node_names()
-    from get_container_ids import get_container_structure
+    from networkstructure.containers import get_container_structure
     machine_list = get_container_structure(node_list)
 
     experiment_number = create_experiment_folder()
-    from docker_stats_kafkas import get_docker_stats_kafkas, save_docker_stats_kafkas
+    from kafkas.kafka_stats import get_docker_stats_kafkas, save_docker_stats_kafkas
     kafka_dict = get_docker_stats_kafkas(machine_list)
 
-    from docker_stats_consumers import get_docker_stats_consumers
+    from consumers.consumer_stats import get_docker_stats_consumers
     consumer_list = get_docker_stats_consumers(machine_list)
-    from create_topics import create_topic_per_consumer
+    from kafkas.create_topics import create_topic_per_consumer
     topic_list = create_topic_per_consumer(consumer_list)
-    from start_consumers import start_consumers
+    from consumers.call_consumer import start_consumers
     start_consumers(topic_list)
    
     sleep(15)
 
-    from docker_stats_producers import get_docker_stats_producers
+    from producers.producer_stats import get_docker_stats_producers
     producer_list = get_docker_stats_producers(machine_list)
-    from start_producers import start_producers
+    from producers.start_producers import start_producers
     start_producers(producer_list, topic_list)
     
     sleep(40)
@@ -70,8 +73,8 @@ if __name__ == '__main__':
         print(f'Getting graph for output file {file_}')
         create_message_graph(experiment_number, file_, save_image= f'{file_}.svg')
 
-    from export_files.compact_files import tar_experiment_dir
+    from exportfiles.compact import tar_experiment_dir
     tar_filepath = tar_experiment_dir(experiment_number)
 
-    from export_files.upload_cloud import gdrive_upload
+    from exportfiles.cloud import gdrive_upload
     gdrive_upload(tar_filepath)

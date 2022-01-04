@@ -5,8 +5,8 @@ import subprocess
 
 parser = argparse.ArgumentParser()
 
-from get_container_ids import get_container_structure
-from get_all_nodes_names import get_node_names
+from networkstructure.containers import get_container_structure
+from networkstructure.nodes import get_node_names
 
 # Topic Creation
 parser.add_argument("-nt", "--new_topic", help="kafka topic to get the messages", nargs='?', const='topic', type=str, default='topic')

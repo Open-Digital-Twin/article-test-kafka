@@ -1,9 +1,9 @@
-from os import get_terminal_size
 import subprocess
-line_width = get_terminal_size().columns
+from auxiliaryfunctions.terminal import print_centralized
 
 def save_docker_stats_kafkas(kafka_dict = {}, exp_number = 0, home_dir = '/home/adbarros'):
-    
+    print_centralized(' Saving docker stats kafkas ')
+
     file_list = []
     for key in kafka_dict.keys():
         kafka_dict[key].kill()
@@ -13,10 +13,12 @@ def save_docker_stats_kafkas(kafka_dict = {}, exp_number = 0, home_dir = '/home/
         with open(f'{home_dir}/experiment_{exp_number}/csv/{file_name}', 'w+') as f:
             f.write(stats_stdout)
 
+    print_centralized(' End ')
     return file_list
 
 def get_docker_stats_kafkas(machine_list):
-    print('\n' + '-' * (int(line_width/2) - 10) + ' Getting stats kafkas ' + '-' * (int(line_width/2) - 10) + '\n')
+
+    print_centralized(' Getting stats kafkas ')
     
     kafka_list = []
     kafka_dict = {}
@@ -31,13 +33,13 @@ def get_docker_stats_kafkas(machine_list):
                 print(f'Getting docker stats kafka {kafka} from node {containers}..')
                 kafka_list.append({'node': containers, 'kafka': kafka})
 
-    print('\n' + '-' * (int(line_width/2) - 2) + ' End ' + '-' * (int(line_width/2) - 3) + '\n')
+    print_centralized(' End ')
     return kafka_dict
 
 if __name__ == "__main__":
-    from get_all_nodes_names import get_node_names
+    from networkstructure.nodes import get_node_names
     nodes = get_node_names()
-    from get_container_ids import get_container_structure
+    from networkstructure.containers import get_container_structure
     container_dict = get_container_structure(nodes)
     dicte = get_docker_stats_kafkas(container_dict)
     print(dicte)

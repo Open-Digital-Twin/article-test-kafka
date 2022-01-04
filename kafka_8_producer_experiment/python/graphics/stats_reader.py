@@ -1,7 +1,11 @@
 import pandas as pd
 from os import makedirs
 
+from auxiliaryfunctions.terminal import print_centralized
+
 def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/'):
+    print_centralized(f' Creating stats graph for: {file_to_open} ')
+
     file_path = f'{home_dir}experiment_{exp_num}/'
     file_to_save = save_image
 
@@ -62,7 +66,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     plt.savefig(out, format= file_type)
     plt.close()
 
-    return 'saved'
+    print_centralized(' End ')
 
 if __name__ == '__main__':
     print(create_stats_graph(exp_num= 636668609, file_to_open= 'docker_stats_4cbf7ab2b0a3.txt', save_image= 'docker_stats_4cbf7ab2b0a3.txt.svg'))

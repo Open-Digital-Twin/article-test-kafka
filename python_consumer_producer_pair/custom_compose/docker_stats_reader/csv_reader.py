@@ -49,5 +49,10 @@ def save_stats_graph(file_path, file_to_open, file_to_save, loose_scales):
     file_to_print = file_to_print.strip()
     out = str(file_path+file_to_print)
     print(f'"{out}"')
-    plt.savefig(out)
+    plt.savefig(out, format="svg")
     plt.close()
+    return 'saved'
+if __name__ == '__main__':
+    from os import getcwd
+    path = getcwd()
+    print(save_stats_graph(path, 'demo.txt', 'demo.svg', True))

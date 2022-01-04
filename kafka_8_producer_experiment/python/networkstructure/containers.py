@@ -1,12 +1,11 @@
-from subprocess import run, Popen, PIPE
-from os import get_terminal_size
+from subprocess import run, PIPE
 from json import dumps
 
-line_width = get_terminal_size().columns
-half_line = int(line_width/2)
+from auxiliaryfunctions.terminal import print_centralized
 
 def get_container_structure(node_name_list = [], exp_num = 0, home_dir = '/home/adbarros/'):
-    print('\n' + '-' * (half_line - 14) + ' Getting container structure ' + '-' * (half_line - 15) + '\n')
+    print_centralized(' Getting container structure ')
+
     container_dict = {}
     for node_name in node_name_list:
         cmd = ['docker', '-H', node_name, 'ps']
@@ -37,7 +36,7 @@ def get_container_structure(node_name_list = [], exp_num = 0, home_dir = '/home/
     with open(f'{home_dir}experiment_{exp_num}/network_structure.txt','w') as file:
         file.write(dumps(container_dict, indent= 2, default= str))
 
-    print('\n' + '-' * (half_line - 2) + ' End ' + '-' * (half_line - 3) + '\n')
+    print_centralized(' End ')
     return container_dict
 
 if __name__ == '__main__':

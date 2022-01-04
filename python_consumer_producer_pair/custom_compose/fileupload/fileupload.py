@@ -1,12 +1,10 @@
 from pydrive.auth import GoogleAuth 
 from pydrive.drive import GoogleDrive 
-from os import getcwd
+from pathlib import Path
 
+folder_path = Path(__file__).parent.absolute()
 
-
-current_directory_for_file_upload = getcwd()
-
-def gdrive_upload(path_to_file= current_directory_for_file_upload + '/fileupload/file.txt'):
+def gdrive_upload(path_to_file= str(folder_path) + '/file.txt'):
     '''
     this functionality requires you to configure a google drive API, and place the correct tokens and settings in files settings.yaml
     for more read: 
@@ -20,3 +18,6 @@ def gdrive_upload(path_to_file= current_directory_for_file_upload + '/fileupload
     gfile = gdrive.CreateFile({'parents':[{'id': '1PTDF7G8Aiw4vQ_TgrjjPztuEfA-OiZeb'}]})
     gfile.SetContentFile(path_to_file)
     gfile.Upload()
+
+if __name__ == '__main__':
+    gdrive_upload()

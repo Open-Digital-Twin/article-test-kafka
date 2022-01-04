@@ -1,7 +1,10 @@
 import pandas as pd
 from os import makedirs
 
+from auxiliaryfunctions.terminal import print_centralized
+
 def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/'):
+    print_centralized(' Creating Message Graph ')
 
     file_path = f'{home_dir}experiment_{exp_num}/'
 
@@ -50,6 +53,9 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         plt.close()
     else:
         plt.show()
+
+    print_centralized(' End ')
+
 
 if __name__ == '__main__':
     create_message_graph(exp_num= 636668609, file_to_open= 'out_dtwins6_c5066011a856_636668609', save_image= 'out_dtwins6_c5066011a856_636668609.png')

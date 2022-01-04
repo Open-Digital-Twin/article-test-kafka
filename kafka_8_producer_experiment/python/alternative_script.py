@@ -1,9 +1,7 @@
-from random import randint
-from os import get_terminal_size
-import subprocess
 from time import sleep
 
 from graphics.stats_reader import create_stats_graph
+from graphics.output_reader import create_message_graph
 from networkstructure import nodes, containers
 from exportfiles import cloud, compact, results
 from consumers import consumer_stats, call_consumer
@@ -37,13 +35,11 @@ start_producers.start_producers(producer_list, topic_list, args.n_messages, args
 sleep(40)
 
 stats_files = kafka_stats.save_docker_stats_kafkas(kafka_dict, experiment_number)
-from graphics.stats_reader import create_stats_graph
 for file_ in stats_files:
     print(f'Getting graph for stats file {file_}')
     create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg')
 
 output_files = results.export_output_files(consumer_list, experiment_number)
-from graphics.output_reader import create_message_graph
 for file_ in output_files:
     print(f'Getting graph for output file {file_}')
     create_message_graph(experiment_number, file_, save_image= f'{file_}.svg')

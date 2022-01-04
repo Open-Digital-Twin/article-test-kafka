@@ -1,12 +1,10 @@
 from random import randint
-from os import get_terminal_size
 import subprocess
 
-line_width = get_terminal_size().columns
-half_line = int(line_width/2)
+from auxiliaryfunctions.terminal import print_centralized
 
 def create_topic_per_consumer(consumer_list = [], replication = 1, partition = 1):
-    print('\n' + '-' * (half_line - 9)+ ' Creating topics ' + '-' * (half_line - 8) + '\n')
+    print_centralized(' Creating topics ')
     
     topic_list = []
     for consumer in consumer_list:
@@ -21,15 +19,15 @@ def create_topic_per_consumer(consumer_list = [], replication = 1, partition = 1
         print(consumer_process.stderr)
         topic_list.append({'node': consumer['node'], 'topic':topic_name, 'consumer':consumer['consumer']})
     
-    print('\n' + '-' * (half_line - 3) + ' End ' + '-' * (half_line - 2) + '\n')
+    print_centralized(' End ')
 
     return topic_list
 
 if __name__ == '__main__':
-    from get_all_nodes_names import get_node_names
+    from networkstructure.nodes import get_node_names
     node_list = get_node_names()
-    from get_container_ids import get_container_structure
-    from docker_stats_consumers import get_docker_stats_consumers
+    from networkstructure.containers import get_container_structure
+    from consumers.consumer_stats import get_docker_stats_consumers
     machine_list = get_container_structure(node_list)
     consumer_list = get_docker_stats_consumers(machine_list)
     create_topic_per_consumer(consumer_list, replication = 3)
