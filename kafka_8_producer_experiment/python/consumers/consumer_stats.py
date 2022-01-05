@@ -37,8 +37,6 @@ def is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
             print(f' --- --- Current count: {current_count}', end='\r')
             sleep(1)
             if (current_count == msg_per_consumer) or (current_count == msg_per_consumer + 1):
-                tmp_file = Path(f'/tmp/{file_name}')
-                tmp_file.unlink(missing_ok = True)
                 completed_consumers.append(consumer)
         sleep(2)
 
