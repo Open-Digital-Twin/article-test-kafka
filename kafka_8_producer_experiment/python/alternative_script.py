@@ -32,7 +32,7 @@ call_consumer.start_consumers(topic_list, msgs_per_topic)
 sleep(7)
 start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay)
 
-consumer_stats.is_experiment_finished(producer_list, msgs_per_topic)
+consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
 
 stats_files = kafka_stats.save_docker_stats_kafkas(kafka_dict, experiment_number)
 for file_ in stats_files:
