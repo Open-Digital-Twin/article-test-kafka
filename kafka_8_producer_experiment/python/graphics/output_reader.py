@@ -58,7 +58,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         print_centralized(' Removing csv folder ')
         from pathlib import Path
         tmp_file = Path(file_path + 'csv/' + file_to_open)
-        tmp_file.unlink(missing_ok = True)
+        tmp_file.unlink()
 
     print_centralized(' End ')
 
