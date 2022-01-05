@@ -11,7 +11,7 @@ from kafkas import create_topics, kafka_stats
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-n', '--n_messages', help='Number of messages sent per producer', nargs = '?', const = 1000, type = int, default = 1000)
-parser.add_argument('-d', '--delay', help='Delay between messages on the producers', nargs = '?', const = 0.01, type = int, default = 0.01)
+parser.add_argument('-d', '--delay', help='Delay between messages on the producers', nargs = '?', const = 0.01, type = float, default = 0.01)
 parser.add_argument('-s', '--message_size', help='Increments message size in chunks of aprox 69 bytes', nargs = '?', const = 0, type = int, default = 0)
 parser.add_argument('-r', '--replication', help='Replication factor per topic', nargs = '?', const = 1, type = int, default = 1)
 parser.add_argument('-p', '--partition', help='Number of partitions per topic', nargs = '?', const = 1, type = int, default = 1)
