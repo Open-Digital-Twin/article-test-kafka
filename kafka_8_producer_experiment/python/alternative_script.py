@@ -15,6 +15,8 @@ parser.add_argument('-d', '--delay', help='Delay between messages on the produce
 parser.add_argument('-s', '--message_size', help='Increments message size in chunks of aprox 69 bytes', nargs = '?', const = 0, type = int, default = 0)
 parser.add_argument('-r', '--replication', help='Replication factor per topic', nargs = '?', const = 1, type = int, default = 1)
 parser.add_argument('-p', '--partition', help='Number of partitions per topic', nargs = '?', const = 1, type = int, default = 1)
+parser.add_argument('-c', '--clear_msg_out', help='Clears csv files after the experiment (helpful if there are too many messages)', nargs = '?', const = 'false', type = str, default = 'false')
+
 args = parser.parse_args()
 
 experiment_number = results.create_experiment_folder()
@@ -46,9 +48,9 @@ except Exception as e:
 try:
     for file_ in output_files:
         print(f'Getting graph for output file {file_}')
-        create_message_graph(experiment_number, file_, save_image= f'{file_}.svg')
+        create_message_graph(experiment_number, file_, save_image= f'{file_}.svg', clear_csv = args.clear_msg_out)
 except Exception as e:
     print(str(e))
-    
+
 tar_filepath = compact.tar_experiment_dir(experiment_number)
 cloud.gdrive_upload(tar_filepath)

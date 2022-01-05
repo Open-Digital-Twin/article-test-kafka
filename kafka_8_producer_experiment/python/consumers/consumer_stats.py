@@ -19,6 +19,7 @@ def get_docker_stats_consumers(machine_list):
     return consumer_list
 
 def is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
+    from pathlib import Path
     print_centralized(' Waiting for the experiment to finish ', fill_in='.')
 
     app_folder = '/usr/src/app'
@@ -26,6 +27,7 @@ def is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
     completed_consumers = []
 
     while len(completed_consumers) < consumer_number:
+        sleep(2)
         for consumer in consumer_list:
             file_name = f'out_{consumer["node"]}_{consumer["consumer"]}'
             cmd_docker = ['docker', f'-H {consumer["node"]}', 'cp', f'{consumer["consumer"]}:{app_folder}/output_consumer', f'/tmp/{file_name}']
@@ -33,9 +35,12 @@ def is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
             subprocess.run(cmd_string, shell=True)
             current_count = rawcount(f'/tmp/{file_name}')
             print(f' --- --- Current count: {current_count}', end='\r')
-            if (current_count == msg_per_consumer) or (current_count == msg_per_consumer + 1):    
+            sleep(1)
+            if (current_count == msg_per_consumer) or (current_count == msg_per_consumer + 1):
+                tmp_file = Path(f'/tmp/{file_name}')
+                tmp_file.unlink(missing_ok = True)
                 completed_consumers.append(consumer)
-        sleep(3)
+        sleep(2)
 
 def rawcount(filename):
     f = open(filename, 'rb')
