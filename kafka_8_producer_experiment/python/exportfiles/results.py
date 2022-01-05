@@ -26,7 +26,7 @@ def export_output_files(consumer_list = [], exp_number = 0, home_dir = '/home/ad
         file_name = f'out_{consumer["node"]}_{consumer["consumer"]}_{exp_number}'
         cmd_docker = ['docker', f'-H {consumer["node"]}', 'cp', f'{consumer["consumer"]}:{app_folder}/output_consumer', f'{home_dir}{exp_folder}/csv/{file_name}']
         cmd_string = ' '.join([str(item) for item in cmd_docker])
-        outputing_file = subprocess.run(cmd_string, shell=True)
+        subprocess.run(cmd_string, shell=True)
         sleep(1)
         output_files.append(file_name)
         print(f'From node {consumer["node"]}, copied consumer {consumer["consumer"]} output, of experiment number {exp_number}')

@@ -30,9 +30,9 @@ msgs_per_topic = int(len(producer_list) / len(consumer_list)) * args.n_messages
 
 call_consumer.start_consumers(topic_list, msgs_per_topic)
 sleep(7)
-
 start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay)
-sleep(40)
+
+consumer_stats.is_experiment_finished()
 
 stats_files = kafka_stats.save_docker_stats_kafkas(kafka_dict, experiment_number)
 for file_ in stats_files:

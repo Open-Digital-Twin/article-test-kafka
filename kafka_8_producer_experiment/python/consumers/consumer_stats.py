@@ -1,3 +1,5 @@
+import subprocess
+from time import sleep
 from auxiliaryfunctions.terminal import print_centralized
 
 def get_docker_stats_consumers(machine_list):
@@ -15,6 +17,37 @@ def get_docker_stats_consumers(machine_list):
     
     print_centralized(' End ')
     return consumer_list
+
+def is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
+    print_centralized(' Waiting for the experiment to finish ', fill_in='.')
+
+    app_folder = '/usr/src/app'
+    consumer_number = len(consumer_list)
+    completed_consumers = []
+
+    while len(completed_consumers) < consumer_number:
+        for consumer in consumer_list:
+            file_name = f'out_{consumer["node"]}_{consumer["consumer"]}'
+            cmd_docker = ['docker', f'-H {consumer["node"]}', 'cp', f'{consumer["consumer"]}:{app_folder}/output_consumer', f'/tmp/csv/{file_name}']
+            cmd_string = ' '.join([str(item) for item in cmd_docker])
+            subprocess.run(cmd_string, shell=True)
+            if (rawcount(f'/tmp/csv/{file_name}') == msg_per_consumer) or (rawcount(f'/tmp/csv/{file_name}') == msg_per_consumer + 1):    
+                completed_consumers.append(consumer)
+        sleep(3)
+
+def rawcount(filename):
+    f = open(filename, 'rb')
+    lines = 0
+    buf_size = 1024 * 1024
+    read_f = f.raw.read
+
+    buf = read_f(buf_size)
+    while buf:
+        lines += buf.count(b'\n')
+        buf = read_f(buf_size)
+
+    f.close
+    return lines
 
 if __name__ == '__main__':
     from networkstructure.nodes import get_node_names
