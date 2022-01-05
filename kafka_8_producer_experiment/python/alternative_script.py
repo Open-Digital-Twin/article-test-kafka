@@ -35,14 +35,20 @@ start_producers.start_producers(producer_list, topic_list, args.n_messages, args
 consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
 
 stats_files = kafka_stats.save_docker_stats_kafkas(kafka_dict, experiment_number)
-for file_ in stats_files:
-    print(f'Getting graph for stats file {file_}')
-    create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg')
-
 output_files = results.export_output_files(consumer_list, experiment_number)
-for file_ in output_files:
-    print(f'Getting graph for output file {file_}')
-    create_message_graph(experiment_number, file_, save_image= f'{file_}.svg')
 
+try:
+    for file_ in stats_files:
+        print(f'Getting graph for stats file {file_}')
+        create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg')
+except Exception as e:
+    print(str(e))
+try:
+    for file_ in output_files:
+        print(f'Getting graph for output file {file_}')
+        create_message_graph(experiment_number, file_, save_image= f'{file_}.svg')
+except Exception as e:
+    print(str(e))
+    
 tar_filepath = compact.tar_experiment_dir(experiment_number)
 cloud.gdrive_upload(tar_filepath)
