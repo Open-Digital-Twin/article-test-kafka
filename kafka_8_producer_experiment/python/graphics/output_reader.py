@@ -56,8 +56,9 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
 
     if (clear_csv == 'true'):
         print_centralized(' Removing csv folder ')
-        import shutil
-        shutil.rmtree(f'{file_path}csv')
+        from pathlib import Path
+        tmp_file = Path(file_path + 'csv/' + file_to_open)
+        tmp_file.unlink(missing_ok = True)
 
     print_centralized(' End ')
 

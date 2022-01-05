@@ -19,7 +19,6 @@ def get_docker_stats_consumers(machine_list):
     return consumer_list
 
 def is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
-    from pathlib import Path
     print_centralized(' Waiting for the experiment to finish ', fill_in='.')
 
     app_folder = '/usr/src/app'
