@@ -28,10 +28,12 @@ def is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
     while len(completed_consumers) < consumer_number:
         for consumer in consumer_list:
             file_name = f'out_{consumer["node"]}_{consumer["consumer"]}'
-            cmd_docker = ['docker', f'-H {consumer["node"]}', 'cp', f'{consumer["consumer"]}:{app_folder}/output_consumer', f'/tmp/csv/{file_name}']
+            cmd_docker = ['docker', f'-H {consumer["node"]}', 'cp', f'{consumer["consumer"]}:{app_folder}/output_consumer', f'/tmp/{file_name}']
             cmd_string = ' '.join([str(item) for item in cmd_docker])
             subprocess.run(cmd_string, shell=True)
-            if (rawcount(f'/tmp/csv/{file_name}') == msg_per_consumer) or (rawcount(f'/tmp/csv/{file_name}') == msg_per_consumer + 1):    
+            current_count = rawcount(f'/tmp/{file_name}')
+            print(f' --- --- Current count: {current_count}', end='\r')
+            if (current_count == msg_per_consumer) or (current_count == msg_per_consumer + 1):    
                 completed_consumers.append(consumer)
         sleep(3)
 
