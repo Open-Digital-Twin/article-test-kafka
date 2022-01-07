@@ -18,7 +18,9 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
 
     # once the file is open, we create the graph
     import matplotlib.pyplot as plt
-
+    plt.rcParams['axes.facecolor'] = (0.5,0.5,0.5,0.5)
+    plt.rcParams['figure.facecolor'] = (1,1,1,0.8)
+    
     graph, ax1 = plt.subplots()
 
     color = 'tab:green'
