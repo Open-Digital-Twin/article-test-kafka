@@ -10,7 +10,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     file_path = f'{home_dir}experiment_{exp_num}/'
     file_to_save = save_image
 
-    panda_csv = pd.read_csv(file_path + 'csv/' + file_to_open, usecols=[1,2], names=['cpu_%', 'mem_usage / limit'])
+    panda_csv = pd.read_csv(file_path + 'csv/' + file_to_open, usecols=[1,2,3], names=['cpu_%', 'mem_usage / limit', 'NetI/O'])
 
     panda_csv.replace('', np.nan, inplace=True)
     panda_csv = panda_csv.dropna()
