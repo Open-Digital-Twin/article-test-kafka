@@ -1,3 +1,4 @@
+from os import write
 from kafka import KafkaConsumer
 from json import loads
 from itertools import count
@@ -29,6 +30,7 @@ consumer = KafkaConsumer(topic,
                          group_id='my-group',
                          value_deserializer=lambda x: loads(x.decode('utf-8'))
                         )
+write_buffer = []
 
 with open('output_consumer', 'w', buffering=1) as redf:
     redf.write('topic, kafka_timestamp, message_value, message_producer_time, message_consumer_time, consumer_produtor_latency, time_passed_since_kafka_timestamp_1, size\n')
@@ -46,13 +48,16 @@ with open('output_consumer', 'w', buffering=1) as redf:
 
         time_passage = (message.timestamp - first_message_timestamp)/1000
         contents = f'{message.topic}, {message.timestamp/1000}  , {message_value}          , {message_producer_time}    , {time}    , {consumer_produtor_latency}      ,      {time_passage}                           '
+        write_buffer.append(f'{contents}, {str(objsize.get_deep_size(message))} \n')
         
         if index % args.output_every == 0:
-            redf.write(f'{contents}, {str(objsize.get_deep_size(message))} \n')
+            redf.write(write_buffer)
+            write_buffer = []
             print(f'message_number: {index}')
         
         if index == (number_of_messages):
-            redf.write(f'{contents}, {str(objsize.get_deep_size(message))} \n')
+            redf.write(write_buffer)
+            write_buffer = []
             redf.close()
             exit()
             break
