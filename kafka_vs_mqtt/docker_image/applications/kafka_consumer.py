@@ -43,7 +43,7 @@ with open('output_consumer', 'w', buffering=1) as redf:
         consumer_produtor_latency = time - message_producer_time
         
         message_value = message.value['value']
-        if index == 0:
+        if index == 1:
             first_message_timestamp = message.timestamp
 
         time_passage = (message.timestamp - first_message_timestamp)/1000
