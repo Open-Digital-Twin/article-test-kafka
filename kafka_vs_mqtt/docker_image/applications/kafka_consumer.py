@@ -51,12 +51,14 @@ with open('output_consumer', 'w', buffering=1) as redf:
         write_buffer.append(f'{contents}, {str(objsize.get_deep_size(message))} \n')
         
         if index % args.output_every == 0:
-            redf.write(write_buffer)
+            for item in write_buffer:
+                redf.write("%s\n" % item)
             write_buffer = []
             print(f'message_number: {index}')
         
         if index == (number_of_messages):
-            redf.write(write_buffer)
+            for item in write_buffer:
+                redf.write("%s\n" % item)
             write_buffer = []
             redf.close()
             exit()
