@@ -18,7 +18,22 @@ def get_docker_stats_consumers(machine_list):
     print_centralized(' End ')
     return consumer_list
 
-def is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
+def is_process_running(consumer_list):
+    first_consumer = consumer_list[0]
+    cmd_docker = ['docker', f'-H {first_consumer["node"]}', 'top', first_consumer["consumer"]]
+    cmd_string = ' '.join([str(item) for item in cmd_docker])
+
+    result = subprocess.run(cmd_string, shell=True)
+
+    process_list = result.stdout.split('\n') # Each line, after line 0 is a container
+    process_list.pop(0)
+
+    return len(process_list)
+
+
+
+# this function is slower, but can be useful if there is some problem with the experiment, since it opens the file and reads the lines
+def old_is_experiment_finished(consumer_list = [], msg_per_consumer = 0):
     print_centralized(' Waiting for the experiment to finish ', fill_in='.')
 
     app_folder = '/usr/src/app'

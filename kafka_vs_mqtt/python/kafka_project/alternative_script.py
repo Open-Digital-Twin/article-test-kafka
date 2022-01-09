@@ -28,13 +28,26 @@ consumer_list = consumer_stats.get_docker_stats_consumers(machine_list)
 producer_list = producer_stats.get_docker_stats_producers(machine_list)
 topic_list = create_topics.create_topic_per_consumer(consumer_list, args.replication, args.partition)
 
+# uma função para ler quantos processos tem no consumidor com docker top
+number_of_processes = consumer_stats.processes_running(consumer_list)
+
 msgs_per_topic = int(len(producer_list) / len(consumer_list)) * args.n_messages
 
 call_consumer.start_consumers(topic_list, msgs_per_topic)
 sleep(7)
 start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay)
 
-consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
+# this function is slower, but can be useful if there is some problem with the experiment, since it opens the file and reads the lines
+# consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
+while True:
+    sleep(2)
+    current_number = consumer_stats.is_process_running(consumer_list)
+    print(current_number, end = '\r')
+    if current_number == number_of_processes:
+        break
+    sleep(1)
+
+sleep(5)
 
 stats_files = kafka_stats.save_docker_stats_kafkas(kafka_dict, experiment_number)
 output_files = results.export_output_files(consumer_list, experiment_number)
