@@ -18,7 +18,7 @@ def get_docker_stats_consumers(machine_list):
     print_centralized(' End ')
     return consumer_list
 
-def is_process_running(consumer_list):
+def processes_running(consumer_list):
     first_consumer = consumer_list[0]
     cmd_docker = ['docker', f'-H {first_consumer["node"]}', 'top', first_consumer["consumer"]]
     cmd_string = ' '.join([str(item) for item in cmd_docker])

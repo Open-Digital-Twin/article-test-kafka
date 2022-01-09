@@ -41,7 +41,7 @@ start_producers.start_producers(producer_list, topic_list, args.n_messages, args
 # consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
 while True:
     sleep(2)
-    current_number = consumer_stats.is_process_running(consumer_list)
+    current_number = consumer_stats.processes_running(consumer_list)
     print(current_number, end = '\r')
     if current_number == number_of_processes:
         break
