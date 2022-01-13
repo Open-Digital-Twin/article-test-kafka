@@ -3,3 +3,4 @@ crc32c
 pandas
 matplotlib
 objsize
+paho-mqtt

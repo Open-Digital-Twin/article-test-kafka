@@ -1,16 +1,15 @@
-from os import write
 from kafka import KafkaConsumer
 from json import loads
 from itertools import count
 from datetime import datetime
-from sys import argv, exit, getsizeof
+from sys import exit
 import time
 import argparse
 import objsize
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-t", "--topic", help="kafka topic to get the messages", nargs='?', const='topic', type=str, default='topic')
-parser.add_argument("-s", "--server", help="kafka container to connect", nargs='?', const='kafka_1', type=str, default='kafka_1')
+parser.add_argument("-s", "--server", help="kafka container to connect", nargs='?', const='experiment_kafka', type=str, default='experiment_kafka')
 parser.add_argument("-p", "--server_port", help="Port where the kafka container listens", nargs='?', const='9091', type=str, default='9091')
 parser.add_argument("-n", "--n_messages", help="Sends N messages", nargs='?', const=1000, type=int, default=1000)
 parser.add_argument("-o", "--output_every", help="Outputs to file every X messages received, and at the end", nargs='?', const=100, type=int, default=100)
