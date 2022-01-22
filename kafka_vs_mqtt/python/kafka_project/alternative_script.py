@@ -25,7 +25,7 @@ if (not args.experiment_type in ('kafka', 'mqtt')):
 
 experiment_number = results.create_experiment_folder(exp_type = args.experiment_type)
 node_list = nodes.get_node_names()
-machine_list = containers.get_container_structure(node_list, experiment_number)
+machine_list = containers.get_container_structure(node_list, experiment_number, exp_type = args.experiment_type)
 
 node_dict = kafka_stats.get_docker_stats_nodes(machine_list, exp_type = args.experiment_type)
 consumer_list = consumer_stats.get_docker_stats_consumers(machine_list)
