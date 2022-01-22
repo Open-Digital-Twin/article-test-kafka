@@ -4,10 +4,10 @@ from os import makedirs
 
 from auxiliaryfunctions.terminal import print_centralized
 
-def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/'):
+def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', home_folder = ''):
     print_centralized(f' Creating stats graph for: {file_to_open} ')
 
-    file_path = f'{home_dir}experiment_{exp_num}/'
+    file_path = f'{home_folder}/{home_dir}experiment_{exp_num}/'
     file_to_save = save_image
 
     panda_csv = pd.read_csv(file_path + 'csv/' + file_to_open, usecols=[1,2,3], names=['cpu_%', 'mem_usage / limit', 'NetI/O'])
@@ -105,10 +105,10 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
 
     file_type = file_to_print.split('.')[-1]
     print(f'"{out}"')
-    plt.savefig(out, format= file_type)
+    plt.savefig(out, format = file_type)
     plt.close()
 
     print_centralized(' End ')
 
 if __name__ == '__main__':
-    print(create_stats_graph(exp_num= 636668609, file_to_open= 'docker_stats_88f30141698f.txt', save_image= 'docker_stats_88f30141698f.txt.svg', home_dir=''))
+    print(create_stats_graph(exp_num = 636668609, home_folder = 'gitignore', file_to_open = 'docker_stats_88f30141698f.txt', save_image = 'docker_stats_88f30141698f.txt.svg', home_dir = ''))

@@ -1,6 +1,5 @@
 from kafka import KafkaConsumer
 from json import loads
-from itertools import count
 from datetime import datetime
 from sys import exit
 import time
@@ -22,21 +21,21 @@ port = args.server_port
 number_of_messages = args.n_messages
 
 # Create an instance of the Kafka producer
-consumer = KafkaConsumer(topic,
-                         bootstrap_servers=server+':'+port,
-                         auto_offset_reset='earliest',
-                         enable_auto_commit=True,
-                         group_id='my-group',
-                         value_deserializer=lambda x: loads(x.decode('utf-8'))
-                        )
-write_buffer = []
+consumer = KafkaConsumer(
+    topic,
+    bootstrap_servers = f'{server}:{port}',
+    auto_offset_reset = 'earliest',
+    enable_auto_commit = True,
+    group_id = 'my-group',
+    value_deserializer = lambda x: loads(x.decode('utf-8'))
+)
 
-with open('output_consumer', 'w', buffering=1) as redf:
+write_buffer = []
+with open('output_consumer', 'w', buffering = 1) as redf:
     redf.write('topic, kafka_timestamp, message_value, message_producer_time, message_consumer_time, consumer_produtor_latency, time_passed_since_kafka_timestamp_1, size\n')
     print("Ctrl+c to Stop")
     # Call the producer.send method with a producer-record
-    counter = count()
-    for (index, message) in enumerate(consumer, start=1):
+    for (index, message) in enumerate(consumer, start = 1):
         time = datetime.timestamp(datetime.now())
         message_producer_time = message.value['producer_time']
         consumer_produtor_latency = time - message_producer_time

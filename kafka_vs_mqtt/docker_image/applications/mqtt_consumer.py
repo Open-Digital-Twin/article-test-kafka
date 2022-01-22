@@ -1,7 +1,7 @@
 # python3.6
 
 import random
-
+from sys import exit
 from paho.mqtt import client as mqtt_client
 
 import argparse
@@ -21,9 +21,13 @@ broker = args.server
 port = args.server_port
 # generate client ID with pub prefix randomly
 client_id = f'python-mqtt-{random.randint(0, 100)}'
+buffer_size = args.output_every
+n_messages = args.n_messages
 # username = 'emqx'
 # password = 'public'
 
+message_buffer = []
+ammount_of_read_messages = 1
 
 def connect_mqtt() -> mqtt_client:
     def on_connect(client, userdata, flags, rc):
@@ -38,10 +42,25 @@ def connect_mqtt() -> mqtt_client:
     client.connect(broker, port)
     return client
 
-
-def subscribe(client: mqtt_client):
+def subscribe(client: mqtt_client, redf):
     def on_message(client, userdata, msg):
+        global ammount_of_read_messages
+
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+        message_buffer.append(msg.payload.decode())
+
+        ammount_of_read_messages += 1
+
+        if len(message_buffer) == buffer_size:
+            for item in message_buffer:
+                redf.write("%s\n" % item)
+            message_buffer.clear()
+            
+        if ammount_of_read_messages == n_messages:
+            for item in message_buffer:
+                redf.write("%s\n" % item)
+            client.disconnect()
+            exit()
 
     client.subscribe(topic)
     client.on_message = on_message
@@ -49,9 +68,12 @@ def subscribe(client: mqtt_client):
 
 def run():
     client = connect_mqtt()
-    subscribe(client)
-    client.loop_forever()
 
+    with open('mqtt_output_consumer', 'w', buffering = 1) as redf:
+        redf.write('topic, kafka_timestamp, message_value, message_producer_time, message_consumer_time, consumer_produtor_latency, time_passed_since_kafka_timestamp_1, size\n')
+        subscribe(client, redf)
+        client.loop_forever()
+    exit()
 
 if __name__ == '__main__':
     run()

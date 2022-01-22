@@ -36,6 +36,7 @@ services:
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   mqtt:
     image: eclipse-mosquitto
+    command: mosquitto -c /mosquitto-no-auth.conf # required for mqtt to accept no credentials remote conections
     networks:
      kafka_net:
     deploy:

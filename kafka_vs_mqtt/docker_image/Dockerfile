@@ -1,7 +1,7 @@
 FROM python:3.6.15-slim
 
 RUN apt-get update && \
-	apt-get -y install bash git vim ca-certificates
+	apt-get -y install bash git vim ca-certificates htop
 
 WORKDIR /usr/src/app
 
@@ -16,3 +16,6 @@ RUN pip3 install kafka-python
 COPY /applications/kafka_producer.py kafka_producer.py
 COPY /applications/kafka_consumer.py kafka_consumer.py
 COPY /applications/kafka_topic_creation.py kafka_topic_creation.py
+
+COPY /applications/mqtt_producer.py mqtt_producer.py
+COPY /applications/mqtt_consumer.py mqtt_consumer.py
