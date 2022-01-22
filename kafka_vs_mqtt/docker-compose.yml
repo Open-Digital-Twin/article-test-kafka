@@ -47,8 +47,8 @@ services:
     deploy:
       replicas: 1
       placement:
-      constraints:
-        - node.labels.name==dtwins1
+        constraints:
+          - node.labels.name==dtwins1
   mqtt:
     image: "emqx/emqx:4.3.8"
     environment:
