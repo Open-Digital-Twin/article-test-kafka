@@ -35,7 +35,7 @@ services:
           - node.labels.name==dtwins1
 # MQTT (MQX) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   etcd:
-    image: 'bitnami/ctcd:latest'
+    image: 'bitnami/etcd:latest'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
@@ -43,7 +43,6 @@ services:
       - ETCDL_API=2
     networks:
       - kafka_net
-    restart: always
     deploy:
       replicas: 1
       placement:
@@ -61,7 +60,6 @@ services:
       - EMQX_ZONE__EXTERNAL__MQUEUE_PRIORITIES=A/A/A=10,A/C/C=5
     networks:
       kafka_net:
-    restart: always
     deploy:
       replicas: 0
       placement:
