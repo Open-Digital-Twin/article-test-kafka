@@ -3,7 +3,8 @@
 import random
 from sys import exit
 from paho.mqtt import client as mqtt_client
-
+import ast
+from datetime import datetime
 import argparse
 import objsize
 parser = argparse.ArgumentParser()
@@ -28,6 +29,7 @@ n_messages = args.n_messages
 
 message_buffer = []
 ammount_of_read_messages = 1
+first_message_timestamp = 0
 
 def connect_mqtt() -> mqtt_client:
     def on_connect(client, userdata, flags, rc):
@@ -45,9 +47,24 @@ def connect_mqtt() -> mqtt_client:
 def subscribe(client: mqtt_client, redf):
     def on_message(client, userdata, msg):
         global ammount_of_read_messages
+        global first_message_timestamp
 
-        print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-        message_buffer.append(msg.payload.decode())
+        message = ast.literal_eval(msg.payload.decode())
+        time = datetime.timestamp(datetime.now())
+        message_producer_time = message['producer_time']
+        consumer_produtor_latency = time - message_producer_time
+        message_value = message['value']
+
+        print(f"Received `{message}` from `{msg.topic}` topic, full msg '{msg}'")
+
+        if ammount_of_read_messages == 1:
+            print('why not here?')
+            first_message_timestamp = message['producer_time']
+        time_passage = (message['producer_time'] - first_message_timestamp)/1000
+
+        contents = f'{msg.topic}, {ammount_of_read_messages}  , {message_value}          , {message_producer_time}    , {time}    , {consumer_produtor_latency}      ,      {time_passage}                           '
+        message_buffer.append(f'{contents}, {str(objsize.get_deep_size(message))}')
+
 
         ammount_of_read_messages += 1
 

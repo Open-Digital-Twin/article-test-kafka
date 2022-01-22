@@ -53,7 +53,6 @@ def run():
     client = connect_mqtt()
     client.loop_start()
     publish(client)
-    client.loop_end()
 
 if __name__ == '__main__':
     run()
