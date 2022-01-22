@@ -35,7 +35,7 @@ def get_container_structure(node_name_list = [], exp_num = 0, home_dir = '/home/
    
     print(dumps(container_dict, indent= 2, default= str))
 
-    with open(f'{home_dir}experiment_{exp_num}/{exp_type}_network_structure.txt','w') as file:
+    with open(f'{home_dir}{exp_type}_experiment_{exp_num}/network_structure.txt','w') as file:
         file.write(dumps(container_dict, indent= 2, default= str))
 
     print_centralized(' End ')
