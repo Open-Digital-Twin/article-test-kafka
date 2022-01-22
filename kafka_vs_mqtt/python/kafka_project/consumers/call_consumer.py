@@ -17,7 +17,7 @@ def start_consumers(topic_list = [], msg_num = 1000, exp_type = 'kafka'):
         cmd_string = ' '.join([str(item) for item in cmd_container])
         subprocess.Popen(cmd_string, shell=True)
 
-        print(f'From node {consumer["node"]}, started producer {consumer["producer"]}, in topic {consumer["topic"]}')
+        print(f'From node {consumer["node"]}, started consumer {consumer["consumer"]}, in topic {consumer["topic"]}')
 
         sleep(2)
 
