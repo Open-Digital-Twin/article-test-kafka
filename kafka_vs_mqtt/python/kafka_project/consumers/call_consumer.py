@@ -8,7 +8,7 @@ def start_consumers(topic_list = [], msg_num = 1000):
     for consumer in topic_list:
         print(f'From node {consumer["node"]}, started consumer {consumer["consumer"]}')
         cmd_docker = ['docker', f'-H {consumer["node"]}', 'exec', '-d',f'{consumer["consumer"]}']
-        cmd_container = cmd_docker + ['python3', 'kafka_consumer.py', '-t', consumer['topic'], '-s', 'kafka_kafka', '-p', '9094', '-n', f'{msg_num}']
+        cmd_container = cmd_docker + ['python3', 'kafka_consumer.py', '-t', consumer['topic'], '-s', 'experiment_kafka', '-p', '9094', '-n', f'{msg_num}']
         cmd_string = ' '.join([str(item) for item in cmd_container])
         consumer_5 = subprocess.Popen(cmd_string, shell=True)
         sleep(2)
