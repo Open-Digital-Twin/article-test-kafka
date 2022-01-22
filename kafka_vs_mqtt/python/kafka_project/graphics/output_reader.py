@@ -3,10 +3,10 @@ from os import makedirs
 
 from auxiliaryfunctions.terminal import print_centralized
 
-def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false'):
+def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false', exp_type = 'kafka'):
     print_centralized(' Creating Message Graph ')
 
-    file_path = f'{home_dir}experiment_{exp_num}/'
+    file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
 
     panda_csv = pd.read_csv(file_path + 'csv/' + file_to_open, skiprows= 1, usecols=[1,3,4,5,6], names=['kafka_timestamp', 'message_producer_time', 'message_consumer_time', 'consumer_produtor_latency', 'time_passed_since_kafka_timestamp_1'])
 

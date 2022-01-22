@@ -3,8 +3,8 @@ from time import sleep
 
 from auxiliaryfunctions.terminal import print_centralized
 
-def tar_experiment_dir(exp_number= '', home_dir= '/home/adbarros/'):
-    exp_folder = f'experiment_{exp_number}'
+def tar_experiment_dir(exp_number= '', home_dir= '/home/adbarros/', exp_type = 'kafka'):
+    exp_folder = f'{exp_type}_experiment_{exp_number}'
     print_centralized(f' Packing into {home_dir}{exp_folder}.tar ')
 
     tar_cmd = ['tar', '-C', f'{home_dir}', '-cvf', f'{home_dir}{exp_folder}.tar', f'{exp_folder}']

@@ -2,7 +2,7 @@ import subprocess
 from time import sleep
 from auxiliaryfunctions.terminal import print_centralized
 
-def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_size = 0, msg_delay = 0.01):
+def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_size = 0, msg_delay = 0.01, exp_type = 'kafka'):
     print_centralized(' Starting producers ')
     
     producer_quantity = len(producer_list)
@@ -16,7 +16,12 @@ def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_
             
             cmd_docker = ['docker', f'-H {producer["node"]}', 'exec', '-d',f'{producer["producer"]}']
             print(cmd_docker)
-            cmd_container = cmd_docker + ['python3', 'kafka_producer.py', '-t', topic['topic'], '-s', 'experiment_kafka', '-p', '9094', '-n', msg_number, '-d', msg_delay, '-e', msg_size]
+            
+            if (exp_type == 'kafka'):
+                cmd_container = cmd_docker + ['python3', f'{exp_type}_producer.py', '-t', topic['topic'], '-s', f'experiment_{exp_type}', '-p', '9094', '-n', msg_number, '-d', msg_delay, '-e', msg_size]
+            else:
+                cmd_container = cmd_docker + ['python3', f'{exp_type}_producer.py', '-t', topic['topic'], '-s', f'experiment_{exp_type}', '-p', 1883, '-n', msg_number, '-d', msg_delay, '-e', msg_size]
+            
             cmd_string = ' '.join([str(item) for item in cmd_container])
             subprocess.Popen(cmd_string, shell=True)
 

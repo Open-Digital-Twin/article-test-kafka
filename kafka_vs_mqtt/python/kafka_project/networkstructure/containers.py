@@ -17,12 +17,14 @@ def get_container_structure(node_name_list = [], exp_num = 0, home_dir = '/home/
         container_name_list = {}
         container_type = 'undefined'
         for container in container_list[:-1]:
-            if '_python_consumer' in container:
+            if ('_python_consumer' in container):
                 container_type = 'consumer'
-            elif '_python_producer' in container:
+            elif ('_python_producer' in container):
                 container_type = 'producer'
             elif ('_kafka' in container):
                 container_type = 'kafka'
+            elif ('_mqtt' in container):
+                container_type = 'mqtt'
             elif ('_zookeeper'):
                 container_type = 'zookeeper'
             if container_type not in container_name_list.keys():

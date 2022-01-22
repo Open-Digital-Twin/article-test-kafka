@@ -4,10 +4,10 @@ from os import makedirs
 
 from auxiliaryfunctions.terminal import print_centralized
 
-def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', home_folder = ''):
+def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', home_folder = '', exp_type = 'kafka'):
     print_centralized(f' Creating stats graph for: {file_to_open} ')
 
-    file_path = f'{home_folder}/{home_dir}experiment_{exp_num}/'
+    file_path = f'{home_folder}/{home_dir}{exp_type}_experiment_{exp_num}/'
     file_to_save = save_image
 
     panda_csv = pd.read_csv(file_path + 'csv/' + file_to_open, usecols=[1,2,3], names=['cpu_%', 'mem_usage / limit', 'NetI/O'])

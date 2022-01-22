@@ -2,15 +2,20 @@ from auxiliaryfunctions.terminal import print_centralized
 from time import sleep
 import subprocess
 
-def start_consumers(topic_list = [], msg_num = 1000):
+def start_consumers(topic_list = [], msg_num = 1000, exp_type = 'kafka'):
     print_centralized(' Starting consumers ')
     
     for consumer in topic_list:
         print(f'From node {consumer["node"]}, started consumer {consumer["consumer"]}')
         cmd_docker = ['docker', f'-H {consumer["node"]}', 'exec', '-d',f'{consumer["consumer"]}']
-        cmd_container = cmd_docker + ['python3', 'kafka_consumer.py', '-t', consumer['topic'], '-s', 'experiment_kafka', '-p', '9094', '-n', f'{msg_num}']
+
+        if exp_type == 'kafka':
+            cmd_container = cmd_docker + ['python3', f'{exp_type}_consumer.py', '-t', consumer['topic'], '-s', f'experiment_{exp_type}', '-p', '9094', '-n', f'{msg_num}']
+        else:
+            cmd_container = cmd_docker + ['python3', f'{exp_type}_consumer.py', '-t', consumer['topic'], '-s', f'experiment_{exp_type}', '-p', 1883, '-n', f'{msg_num}']
+
         cmd_string = ' '.join([str(item) for item in cmd_container])
-        consumer_5 = subprocess.Popen(cmd_string, shell=True)
+        subprocess.Popen(cmd_string, shell=True)
         sleep(2)
 
     sleep(1)

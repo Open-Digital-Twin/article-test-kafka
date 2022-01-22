@@ -5,11 +5,11 @@ from time import sleep
 
 from auxiliaryfunctions.terminal import print_centralized
 
-def create_experiment_folder(home_dir = '/home/adbarros'):
+def create_experiment_folder(home_dir = '/home/adbarros', exp_type = 'kafka'):
     print_centralized(' Creating experiment folder ')
 
     exp_number = randint(111111111,999999999)
-    exp_folder = f'/experiment_{exp_number}'
+    exp_folder = f'/{exp_type}_experiment_{exp_number}'
     makedirs(f'{home_dir}{exp_folder}', exist_ok = True)
     makedirs(f'{home_dir}{exp_folder}/csv', exist_ok = True)
     makedirs(f'{home_dir}{exp_folder}/graphs', exist_ok = True)
@@ -17,14 +17,14 @@ def create_experiment_folder(home_dir = '/home/adbarros'):
     print_centralized(' End ')
     return exp_number
 
-def export_output_files(consumer_list = [], exp_number = 0, home_dir = '/home/adbarros'):
+def export_output_files(consumer_list = [], exp_number = 0, home_dir = '/home/adbarros', exp_type = 'kafka'):
     print_centralized(' Exporting files ')
     app_folder = '/usr/src/app'
-    exp_folder = f'/experiment_{exp_number}'
+    exp_folder = f'/{exp_type}_experiment_{exp_number}'
     output_files = []
     for consumer in consumer_list:
         file_name = f'out_{consumer["node"]}_{consumer["consumer"]}_{exp_number}'
-        cmd_docker = ['docker', f'-H {consumer["node"]}', 'cp', f'{consumer["consumer"]}:{app_folder}/output_consumer', f'{home_dir}{exp_folder}/csv/{file_name}']
+        cmd_docker = ['docker', f'-H {consumer["node"]}', 'cp', f'{consumer["consumer"]}:{app_folder}/output_{exp_type}_consumer', f'{home_dir}{exp_folder}/csv/{file_name}']
         cmd_string = ' '.join([str(item) for item in cmd_docker])
         subprocess.run(cmd_string, shell=True)
         sleep(1)

@@ -31,7 +31,7 @@ consumer = KafkaConsumer(
 )
 
 write_buffer = []
-with open('output_consumer', 'w', buffering = 1) as redf:
+with open('output_kafka_consumer', 'w', buffering = 1) as redf:
     redf.write('topic, kafka_timestamp, message_value, message_producer_time, message_consumer_time, consumer_produtor_latency, time_passed_since_kafka_timestamp_1, size\n')
     print("Ctrl+c to Stop")
     # Call the producer.send method with a producer-record
