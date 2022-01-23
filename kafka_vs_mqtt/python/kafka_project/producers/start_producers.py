@@ -5,14 +5,9 @@ from auxiliaryfunctions.terminal import print_centralized
 def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_size = 0, msg_delay = 0.01, exp_type = 'kafka'):
     print_centralized(' Starting producers ')
     
-    producer_quantity = len(producer_list)
-    topic_quantity = len(topic_list)
-    producer_per_topic = int(producer_quantity/topic_quantity)
-
     for topic in topic_list:
-        begin = 0
         print(producer_list)
-        for producer in producer_list[begin : begin + producer_per_topic]:
+        for producer in producer_list:
             
             cmd_docker = ['docker', f'-H {producer["node"]}', 'exec', '-d',f'{producer["producer"]}']
             print(cmd_docker)
@@ -25,7 +20,6 @@ def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_
             cmd_string = ' '.join([str(item) for item in cmd_container])
             subprocess.Popen(cmd_string, shell=True)
 
-            begin += 1
             print(f'From node {producer["node"]}, started producer {producer["producer"]}, in topic {topic["topic"]}')
 
     print_centralized(' End ')

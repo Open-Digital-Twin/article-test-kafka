@@ -32,7 +32,7 @@ services:
       replicas: 3
       placement:    
         constraints:
-          - node.labels.name==dtwins1
+          - node.labels.kafka_role==producer_pair
 # MQTT (MQX) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   etcd:
     image: 'bitnami/etcd:latest'
