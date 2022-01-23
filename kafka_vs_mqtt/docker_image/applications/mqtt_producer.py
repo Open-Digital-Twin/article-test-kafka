@@ -34,6 +34,9 @@ def connect_mqtt():
     client.connect(broker, port)
     return client
 
+extra_payload = []
+for ammount in range(args.entries):
+    extra_payload.append('qwertyuiopçlkjhgfdsazxcvbnmqwertyuiooooooopçlkjhgfdsazxcvbnmqwertyuiopçlkjhgfdsazxcvbnm')
 
 def publish(client):
     msg_count = 0
@@ -41,7 +44,9 @@ def publish(client):
         sleep(delay)
         msg = str({
             'value': random.randint(100,999), 
-            'producer_time': datetime.timestamp(datetime.now())
+            'producer_time': datetime.timestamp(datetime.now()),
+            'extra_load': 'qwertyuiopçlkjhgfdsazxcvbnmqwertyuiooooooopçlkjhgfdsazxcvbnmqwertyuiopçlkjhgfdsazxcvbnm',
+            'extra_extra_load': extra_payload
         })
         client.publish(topic, msg)
         if msg_count % 100 == 0:

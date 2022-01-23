@@ -29,11 +29,13 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
 
     net_in = net_io_tmp['Net In'].str.replace('kB', '')
     net_in = net_in.str.replace('MB', '')
+    net_in = net_in.str.replace('B', '')
     net_in = net_in.str.replace('"', '')
     net_in = pd.to_numeric(net_in, downcast='float')
 
     net_out = net_io_tmp['Net Out'].str.replace('kB', '')
     net_out = net_out.str.replace('MB', '')
+    net_out = net_out.str.replace('B', '')
     net_out = net_out.str.replace('"', '')
     net_out = pd.to_numeric(net_out, downcast='float')
 
