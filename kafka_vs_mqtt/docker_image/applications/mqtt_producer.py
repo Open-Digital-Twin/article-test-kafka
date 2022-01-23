@@ -36,7 +36,7 @@ def connect_mqtt():
 
 extra_payload = []
 for ammount in range(args.entries):
-    extra_payload.append('qwertyuiopçlkjhgfdsazxcvbnmqwertyuiooooooopçlkjhgfdsazxcvbnmqwertyuiopçlkjhgfdsazxcvbnm')
+    extra_payload.append('qwertyuiopçlkjhgfdsazxcvbnmqwerty')
 
 def publish(client):
     msg_count = 0
@@ -45,7 +45,7 @@ def publish(client):
         msg = str({
             'value': random.randint(100,999), 
             'producer_time': datetime.timestamp(datetime.now()),
-            'extra_load': 'qwertyuiopçlkjhgfdsazxcvbnmqwertyuiooooooopçlkjhgfdsazxcvbnmqwertyuiopçlkjhgfdsazxcvbnm',
+            'extra_load': 'qwertyuiopçlkjhgfdsazxcvbnmqwerty',
             'extra_extra_load': extra_payload
         })
         client.publish(topic, msg)
