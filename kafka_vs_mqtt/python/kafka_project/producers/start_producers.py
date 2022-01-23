@@ -8,19 +8,19 @@ def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_
     for topic in topic_list:
         print(producer_list)
         for producer in producer_list:
-            
-            cmd_docker = ['docker', f'-H {producer["node"]}', 'exec', '-d',f'{producer["producer"]}']
-            print(cmd_docker)
-            
-            if (exp_type == 'kafka'):
-                cmd_container = cmd_docker + ['python3', f'{exp_type}_producer.py', '-t', topic['topic'], '-s', f'experiment_{exp_type}', '-p', '9094', '-n', msg_number, '-d', msg_delay, '-e', msg_size]
-            else:
-                cmd_container = cmd_docker + ['python3', f'{exp_type}_producer.py', '-t', topic['topic'], '-s', f'experiment_{exp_type}', '-p', 1883, '-n', msg_number, '-d', msg_delay, '-e', msg_size]
-            
-            cmd_string = ' '.join([str(item) for item in cmd_container])
-            subprocess.Popen(cmd_string, shell=True)
+            if producer['node'] == topic['node']:
+                cmd_docker = ['docker', f'-H {producer["node"]}', 'exec', '-d',f'{producer["producer"]}']
+                print(cmd_docker)
+                
+                if (exp_type == 'kafka'):
+                    cmd_container = cmd_docker + ['python3', f'{exp_type}_producer.py', '-t', topic['topic'], '-s', f'experiment_{exp_type}', '-p', '9094', '-n', msg_number, '-d', msg_delay, '-e', msg_size]
+                else:
+                    cmd_container = cmd_docker + ['python3', f'{exp_type}_producer.py', '-t', topic['topic'], '-s', f'experiment_{exp_type}', '-p', 1883, '-n', msg_number, '-d', msg_delay, '-e', msg_size]
+                
+                cmd_string = ' '.join([str(item) for item in cmd_container])
+                subprocess.Popen(cmd_string, shell=True)
 
-            print(f'From node {producer["node"]}, started producer {producer["producer"]}, in topic {topic["topic"]}')
+                print(f'From node {producer["node"]}, started producer {producer["producer"]}, in topic {topic["topic"]}')
 
     print_centralized(' End ')
 
