@@ -46,7 +46,7 @@ with open('output_kafka_consumer', 'w', buffering = 1) as redf:
 
         time_passage = (message.timestamp - first_message_timestamp)/1000
         contents = f'{message.topic}, {message.timestamp/1000}  , {message_value}          , {message_producer_time}    , {time}    , {consumer_produtor_latency}      ,      {time_passage}                           '
-        write_buffer.append(f'{contents}, {str(objsize.get_deep_size(message))}')
+        write_buffer.append(f'{contents}, {str(objsize.get_deep_size(message.value))}')
         
         if index % args.output_every == 0:
             for item in write_buffer:

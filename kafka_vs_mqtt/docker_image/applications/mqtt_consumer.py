@@ -63,7 +63,7 @@ def subscribe(client: mqtt_client, redf):
         time_passage = (message['producer_time'] - first_message_timestamp)/1000
 
         contents = f'{msg.topic}, {ammount_of_read_messages}  , {message_value}          , {message_producer_time}    , {time}    , {consumer_produtor_latency}      ,      {time_passage}                           '
-        message_buffer.append(f'{contents}, {str(objsize.get_deep_size(message))}')
+        message_buffer.append(f'{contents}, {str(objsize.get_deep_size(msg))}')
 
 
         ammount_of_read_messages += 1
