@@ -26,24 +26,39 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     mem_tmp2 = pd.DataFrame(panda_csv['mem_usage / limit'].str.split('/', 1).tolist(),
                                         columns = ['mem_usage', 'limit'], index = panda_csv.index)
 
+    net_in = net_io_tmp['Net In'].str.replace('B','')
+    net_in = net_in.replace(
+            {
+                'k': '*1e3', 
+                'M': '*1e6', 
+                '-':'*-1'
+            }, 
+            regex=True
+        ).map(pd.eval).astype(int)
+    net_in = net_in.div(1000000)
 
-    net_in = net_io_tmp['Net In'].str.replace('kB', '')
-    net_in = net_in.str.replace('MB', '')
-    net_in = net_in.str.replace('B', '')
-    net_in = net_in.str.replace('"', '')
-    net_in = pd.to_numeric(net_in, downcast='float')
+    net_out = net_io_tmp['Net Out'].str.replace('B"','')
+    net_out = net_out.replace(
+            {
+                'k': '*1e3', 
+                'M': '*1e6', 
+                '-':'*-1'
+            }, 
+            regex=True
+        ).map(pd.eval).astype(int)
+    net_out = net_out.div(1000000)
 
-    net_out = net_io_tmp['Net Out'].str.replace('kB', '')
-    net_out = net_out.str.replace('MB', '')
-    net_out = net_out.str.replace('B', '')
-    net_out = net_out.str.replace('"', '')
-    net_out = pd.to_numeric(net_out, downcast='float')
-
-    mem_usag = mem_tmp2['mem_usage'].str.replace('MiB', '')
-    mem_tmp2['mem_usage'] = mem_tmp2['mem_usage'].str.replace('GiB', '')
-    mem_usag = mem_tmp2['mem_usage'].str.replace('MiB', '')
-
-    mem_usag = pd.to_numeric(mem_usag, downcast='float')
+    mem_usag = mem_tmp2['mem_usage'].str.replace('B','')
+    mem_usag = mem_usag.replace(
+            {
+                'k': '*1e3', 
+                'Mi': '*1e6', 
+                'Gi': '*1e9', 
+                '-':'*-1'
+            }, 
+            regex=True
+        ).map(pd.eval).astype(int)
+    mem_usag = mem_usag.div(1000000)
 
     usage_mean = mem_usag.max()
     cpu_p_mean = cpu_perc.mean()
@@ -80,7 +95,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
 
     color = 'tab:green'
 
-    ax1[1].set_ylabel('Net In (kB -> MB)', color=color)  # we already handled the x-label with ax1
+    ax1[1].set_ylabel('Net In (MB)', color=color)  # we already handled the x-label with ax1
     if not loose_scales:
         plt.ylim([0, 100])
     ax1[1].plot(x, net_in, color=color)
@@ -90,7 +105,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
 
     color = 'tab:red'
     ax4 = ax1[1].twinx()  # instantiate a second axes that shares the same x-axis
-    ax4.set_ylabel('Net Out (kB -> MB)', color=color)  # we already handled the x-label with ax1
+    ax4.set_ylabel('Net Out (MB)', color=color)  # we already handled the x-label with ax1
     if not loose_scales:
         plt.ylim([0, 100])
     ax4.plot(x, net_out, color=color)
