@@ -3,7 +3,6 @@ from json import dumps
 import random
 from time import sleep
 from datetime import datetime
-from sys import getsizeof
 import argparse
 import objsize
 
@@ -33,6 +32,7 @@ data = {}
 
 for i in range(1, (args.entries) + 1):
     data[f'{i}'] = 'justAfixedSizeString'
+
 timestamp_example = datetime.timestamp(datetime.now())
 value_example = str(random.randint(100,999))
 total_exp_size = (objsize.get_deep_size(data) + objsize.get_deep_size(value_example) + objsize.get_deep_size(timestamp_example)) * number_of_messages
@@ -46,6 +46,5 @@ for i in range(number_of_messages):
     data['producer_time'] = datetime.timestamp(datetime.now())
     producer.send(topic, data)
     if i % 100 == 0:
-        #print(f'data: {data}, size:{objsize.get_deep_size(data)}')
-        print(f'Progress: {i} out of {number_of_messages}', '\r')
+        print(f'Progress: {i} out of {number_of_messages}', end = '\r')
     sleep(delay)

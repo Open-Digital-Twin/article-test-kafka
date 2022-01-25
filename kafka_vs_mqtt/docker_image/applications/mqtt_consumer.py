@@ -50,21 +50,16 @@ def subscribe(client: mqtt_client, redf):
         global first_message_timestamp
 
         message = ast.literal_eval(msg.payload.decode())
-        time = datetime.timestamp(datetime.now())
-        message_producer_time = message['producer_time']
-        consumer_produtor_latency = time - message_producer_time
-        message_value = message['value']
 
-        print(f"Received `{message}` from `{msg.topic}` topic, full msg '{msg}'")
+        current_time = datetime.timestamp(datetime.now())
+        producer_time = message['producer_time']
+        value = message['value']
+        message_size = objsize.get_deep_size(msg.payload)
+        package_size = objsize.get_deep_size(msg)
+        topic = msg.topic
 
-        if ammount_of_read_messages == 1:
-            print('why not here?')
-            first_message_timestamp = message['producer_time']
-        time_passage = (message['producer_time'] - first_message_timestamp)/1000
-
-        contents = f'{msg.topic}, {ammount_of_read_messages}  , {message_value}          , {message_producer_time}    , {time}    , {consumer_produtor_latency}      ,      {time_passage}                           '
-        message_buffer.append(f'{contents}, {str(objsize.get_deep_size(msg))}')
-
+        contents = f'{topic},{value},{producer_time},{current_time},{message_size},{package_size}'
+        message_buffer.append(contents)
 
         ammount_of_read_messages += 1
 
@@ -72,6 +67,7 @@ def subscribe(client: mqtt_client, redf):
             for item in message_buffer:
                 redf.write("%s\n" % item)
             message_buffer.clear()
+            print(f'message_number: {ammount_of_read_messages}', end = '\r')
             
         if ammount_of_read_messages == n_messages:
             for item in message_buffer:
@@ -87,7 +83,7 @@ def run():
     client = connect_mqtt()
 
     with open('output_mqtt_consumer', 'w', buffering = 1) as redf:
-        redf.write('topic, kafka_timestamp, message_value, message_producer_time, message_consumer_time, consumer_produtor_latency, time_passed_since_kafka_timestamp_1, size\n')
+        redf.write('topic,message_value,message_producer_time,message_consumer_time,message_size,total_size\n')
         subscribe(client, redf)
         client.loop_forever()
     exit()
