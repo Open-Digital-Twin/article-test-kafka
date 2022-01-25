@@ -2,9 +2,9 @@ from kafka import KafkaConsumer
 from json import loads
 from datetime import datetime
 from sys import exit
-import time
-import argparse
 import objsize
+
+import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-t", "--topic", help="kafka topic to get the messages", nargs='?', const='topic', type=str, default='topic')

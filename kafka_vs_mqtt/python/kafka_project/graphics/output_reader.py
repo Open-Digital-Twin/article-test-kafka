@@ -31,12 +31,12 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
     ax1.plot(
         csv_header, latencies, color = color,
         label = \
-            "Timelapse kafka stamps:" + str(time_elapsed_for_kafka.round(6)) + "\n" if time_elapsed_for_kafka else "" +
+            f'{"Timelapse kafka stamps: " + str(time_elapsed_for_kafka.round(6)) if time_elapsed_for_kafka else ""} \n' +
             f'Experiment timelapse: {experiment_time.round(6)}\n' +
             f'Mean latency: {latencies.mean().round(6)}\n' +
             f'First latency: {latencies[0].round(6)}\n' +
             f'Last latency: {latencies.iloc[-1].round(6)}\n' +
-            f'Message size: {panda_csv["message_size"][0]} :: '
+            f'Message size: {panda_csv["message_size"][0]} :: ' +
             f'Package size: {panda_csv["total_size"][0]}'
     )
 
