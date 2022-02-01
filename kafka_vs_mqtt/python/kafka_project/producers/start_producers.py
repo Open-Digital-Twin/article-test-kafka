@@ -2,13 +2,18 @@ import subprocess
 from time import sleep
 from auxiliaryfunctions.terminal import print_centralized
 
-def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_size = 0, msg_delay = 0.01, exp_type = 'kafka'):
+def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_size = 0, msg_delay = 0.01, exp_type = 'kafka', limit_conn = True, conn_limit = 1):
     print_centralized(' Starting producers ')
-    
+       
+    for topic in topic_list:
+        topic['connected_prod'] = 0 
+
     for topic in topic_list:
         print(producer_list)
         for producer in producer_list:
-            if producer['node'] == topic['node']:
+            if producer['node'] == topic['node'] and (limit_conn is False or topic['connected_prod'] <= conn_limit):
+                topic['connected_prod'] += 1
+
                 cmd_docker = ['docker', f'-H {producer["node"]}', 'exec', '-d',f'{producer["producer"]}']
                 print(cmd_docker)
                 
