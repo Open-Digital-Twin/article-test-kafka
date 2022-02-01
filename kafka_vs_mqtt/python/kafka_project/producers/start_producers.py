@@ -12,9 +12,12 @@ def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_
 
     for producer in producer_list:
         producer['connected_topics'] = 0
+    print(f'Ammount of producers: {len(producer_list)}')
+    print(producer_list)
+    print(f'Ammount of topics: {len(topic_list)}')
+    print(topic_list)
 
     for topic in topic_list:
-        print(producer_list)
         for producer in producer_list:
             if (producer['node'] == topic['node']) and (limit_conn is False or topic['connected_prod'] < conn_limit) and (producer['connected_topics'] < topic_per_producer):
                 topic['connected_prod'] += 1
