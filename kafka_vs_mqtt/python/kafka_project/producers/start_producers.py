@@ -6,7 +6,7 @@ def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_
     print_centralized(' Starting producers ')
        
     for topic in topic_list:
-        topic['connected_prod'] = 0 
+        topic['connected_prod'] = 1 
 
     for topic in topic_list:
         print(producer_list)
