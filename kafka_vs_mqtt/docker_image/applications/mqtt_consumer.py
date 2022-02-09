@@ -81,10 +81,9 @@ def subscribe(client: mqtt_client, redf):
 
 def run():
     client = connect_mqtt()
-
     with open('output_mqtt_consumer', 'w', buffering = 1) as redf:
         redf.write('topic,message_value,message_producer_time,message_consumer_time,message_size,total_size\n')
-        subscribe(client, redf)
+        subscribe(client, redf, qos=1)
         client.loop_forever()
     exit()
 

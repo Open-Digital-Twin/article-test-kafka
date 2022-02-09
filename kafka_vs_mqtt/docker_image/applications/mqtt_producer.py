@@ -48,7 +48,7 @@ def publish(client):
             'producer_time': datetime.timestamp(datetime.now()),
             'extra_load': extra_payload
         })
-        client.publish(topic, msg)
+        client.publish(topic, msg, qos=1)
         if msg_count % 100 == 0:
             print(f'Progress: {msg_count} out of {number_of_messages}', '\r')
 
