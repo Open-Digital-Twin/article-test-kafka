@@ -39,7 +39,7 @@ msgs_per_topic = int(len(producer_list) / len(consumer_list)) * args.n_messages
 
 call_consumer.start_consumers(topic_list, msgs_per_topic, exp_type = args.experiment_type)
 sleep(7)
-start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type = args.experiment_type)
+start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type = args.experiment_type, wait_between = 1)
 
 # this function is slower, but can be useful if there is some problem with the experiment, since it opens the file and reads the lines
 # consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
