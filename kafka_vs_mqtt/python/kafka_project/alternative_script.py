@@ -56,18 +56,19 @@ sleep(5)
 stats_files = kafka_stats.save_docker_stats_kafkas(node_dict, experiment_number, exp_type = args.experiment_type)
 output_files = results.export_output_files(consumer_list, experiment_number, exp_type = args.experiment_type)
 
-try:
-    for file_ in stats_files:
-        print(f'Getting graph for stats file {file_}')
+for file_ in stats_files:
+    print(f'Getting graph for stats file {file_}')
+    try:
         create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type = args.experiment_type)
-except Exception as e:
-    print(str(e))
-try:
-    for file_ in output_files:
-        print(f'Getting graph for output file {file_}')
+    except Exception as e:
+        print(str(e))
+
+for file_ in output_files:
+    print(f'Getting graph for output file {file_}')
+    try:
         create_message_graph(experiment_number, file_, save_image= f'{file_}.svg', clear_csv = args.clear_msg_out, exp_type = args.experiment_type)
-except Exception as e:
-    print(str(e))
+    except Exception as e:
+        print(str(e))
 
 tar_filepath = compact.tar_experiment_dir(experiment_number, exp_type = args.experiment_type)
 cloud.gdrive_upload(tar_filepath)
