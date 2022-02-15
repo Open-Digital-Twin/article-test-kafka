@@ -13,8 +13,9 @@ def get_node_names():
 
     node_name_list = []
     for node in node_list:
-        temp_node = node.split(' ')[5]
-        if temp_node == '': temp_node = 'dtwins1'
+        node_line = node.split(' ')
+        temp_node = node_line[5]
+        if temp_node == '': temp_node = node_line[6]
         node_name_list.append(temp_node)
 
     print(node_name_list)
