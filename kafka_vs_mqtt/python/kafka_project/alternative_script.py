@@ -34,8 +34,10 @@ producer_list = producer_stats.get_docker_stats_producers(machine_list)
 topic_list = create_topics.create_topic_per_consumer(consumer_list, args.replication, args.partition, exp_type = args.experiment_type)
 
 number_of_processes = consumer_stats.processes_running(consumer_list)
+number_of_producers = len(producer_list)
+number_of_consumers = len(consumer_list)
 
-msgs_per_topic = int(len(producer_list) / len(consumer_list)) * args.n_messages
+msgs_per_topic = int(number_of_producers / number_of_consumers) * args.n_messages
 
 call_consumer.start_consumers(topic_list, msgs_per_topic, exp_type = args.experiment_type)
 sleep(7)

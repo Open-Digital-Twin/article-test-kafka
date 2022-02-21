@@ -22,16 +22,16 @@ def get_docker_stats_nodes(machine_list = '', exp_type = 'kafka'):
     
     kafka_list = []
     kafka_dict = {}
-    for containers in machine_list:
-        if (exp_type in machine_list[containers].keys()):
-            for kafka in machine_list[containers][exp_type]:
-                ##Collecting kafka containers stats
+    for machine in machine_list:
+        if (exp_type in machine_list[machine].keys()):
+            for kafka in machine_list[machine][exp_type]:
+                ##Collecting kafka container stats
                 kafka_dict[kafka] = 0
-                cmd_docker = ['docker', f'-H {containers}', 'stats', kafka , '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"']
+                cmd_docker = ['docker', f'-H {machine}', 'stats', kafka , '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"']
                 kafka_dict[kafka] = subprocess.Popen(cmd_docker, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
                 
-                print(f'Getting docker stats kafka {kafka} from node {containers}..')
-                kafka_list.append({'node': containers, exp_type: kafka})
+                print(f'Getting docker stats kafka {kafka} from node {machine}..')
+                kafka_list.append({'node': machine, exp_type: kafka})
 
     print_centralized(' End ')
     return kafka_dict

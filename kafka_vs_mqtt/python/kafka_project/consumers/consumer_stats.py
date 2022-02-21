@@ -21,15 +21,16 @@ def get_docker_stats_consumers(machine_list):
 def processes_running(consumer_list):
     from subprocess import PIPE
 
-    first_consumer = consumer_list[0]
-    cmd_docker = ['docker', f'-H {first_consumer["node"]}', 'top', first_consumer["consumer"]]
+    consumer_list_processes = []
+    for consumer in consumer_list:
+        cmd_docker = ['docker', f'-H {consumer["node"]}', 'top', consumer["consumer"]]    
+        result = subprocess.run(cmd_docker, stdout=PIPE, universal_newlines=True)
+        process_list = result.stdout.split('\n') # Each line, after line 0 is a container
+        process_list.pop(0)
 
-    result = subprocess.run(cmd_docker, stdout=PIPE, universal_newlines=True)
+        consumer_list_processes.append({consumer["node"]: len(process_list)})
 
-    process_list = result.stdout.split('\n') # Each line, after line 0 is a container
-    process_list.pop(0)
-
-    return len(process_list)
+    return consumer_list_processes
 
 
 
