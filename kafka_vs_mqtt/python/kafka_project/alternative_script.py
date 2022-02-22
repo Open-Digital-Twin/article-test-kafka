@@ -50,9 +50,15 @@ try:
     while True:
         sleep(2)
         current_number = consumer_stats.processes_running(consumer_list)
-        print(current_number, end = '\r')
         if current_number == number_of_processes:
+            print('All done!')
             break
+        for position in current_number:
+            for consumer in position:
+                if current_number[position][consumer] ==  number_of_processes[position][consumer]:
+                    current_number[position][consumer] = 'Done!'
+        print(current_number, end = '\033[A\033[A\r')
+
         sleep(1)
 except KeyboardInterrupt:
     pass

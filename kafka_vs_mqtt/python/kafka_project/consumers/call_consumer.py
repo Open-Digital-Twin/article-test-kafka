@@ -6,7 +6,6 @@ def start_consumers(topic_list = [], msg_num = 1000, exp_type = 'kafka'):
     print_centralized(' Starting consumers ')
     
     for consumer in topic_list:
-        print(f'From node {consumer["node"]}, started consumer {consumer["consumer"]}')
         cmd_docker = ['docker', f'-H {consumer["node"]}', 'exec', '-d',f'{consumer["consumer"]}']
 
         if exp_type == 'kafka':
