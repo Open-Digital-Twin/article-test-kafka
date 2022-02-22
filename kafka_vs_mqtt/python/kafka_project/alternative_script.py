@@ -53,12 +53,13 @@ try:
         if current_number == number_of_processes:
             print('All done!')
             break
-        for position in current_number:
-            for consumer in position:
-                if current_number[position][consumer] ==  number_of_processes[position][consumer]:
-                    current_number[position][consumer] = 'Done!'
-        print(current_number, end = '\033[A\033[A\r')
+        for current_value in current_number: # kinda convoluted, but updates to done, if the consumer is finished
+            for initial_value in number_of_processes:
+                if current_value ==  initial_value:
+                    current_value[next(iter(current_value))] = 'Done!'
 
+        print(current_number, end = '\033[A\033[A\r') # '\033[A' returns a line on linux terminal, and \r returns to the start of line
+        # so this goes up two lines, and goes to the start of the line, to overwrite the text
         sleep(1)
 except KeyboardInterrupt:
     pass
