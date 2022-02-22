@@ -30,7 +30,8 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     net_in = net_in.replace(
             {
                 'k': '*1e3', 
-                'M': '*1e6', 
+                'M': '*1e6',
+                'G': '*1e9',  
                 '-':'*-1'
             }, 
             regex=True
@@ -41,7 +42,8 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     net_out = net_out.replace(
             {
                 'k': '*1e3', 
-                'M': '*1e6', 
+                'M': '*1e6',
+                'G': '*1e9',
                 '-':'*-1'
             }, 
             regex=True
@@ -128,4 +130,4 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     print_centralized(' End ')
 
 if __name__ == '__main__':
-    print(create_stats_graph(exp_num = 636668609, home_folder = 'gitignore', file_to_open = 'docker_stats_88f30141698f.txt', save_image = 'docker_stats_88f30141698f.txt.svg', home_dir = ''))
+    print(create_stats_graph(exp_num = 636668609, home_folder = 'gitignore', file_to_open = 'docker_stats_14ae06c24a27.txt', save_image = 'docker_stats_14ae06c24a27.txt.svg', home_dir = ''))
