@@ -23,11 +23,11 @@ if (not args.experiment_type in ('kafka', 'mqtt')):
     print('Invalid experiment typing, must be either "kafka" or "mqtt"')
     exit()
 
-experiment_number = results.create_experiment_folder(exp_type = args.experiment_type)
+experiment_number = results.create_experiment_folder(exp_type=args.experiment_type)
 node_list = nodes.get_node_names()
-machine_list = containers.get_container_structure(node_list, experiment_number, exp_type = args.experiment_type)
+machine_list = containers.get_container_structure(node_list, experiment_number, exp_type=args.experiment_type)
 
-node_dict = kafka_stats.get_docker_stats_nodes(machine_list, exp_type = args.experiment_type)
+node_dict, stats_files = kafka_stats.docker_stats_to_file(machine_list, exp_type=args.experiment_type, exp_number=experiment_number)
 consumer_list = consumer_stats.get_docker_stats_consumers(machine_list)
 producer_list = producer_stats.get_docker_stats_producers(machine_list)
 
@@ -40,12 +40,13 @@ number_of_consumers = len(consumer_list)
 
 msgs_per_topic = int(number_of_producers / number_of_consumers) * args.n_messages
 
-call_consumer.start_consumers(topic_list, msgs_per_topic, exp_type = args.experiment_type)
+call_consumer.start_consumers(topic_list, msgs_per_topic, exp_type=args.experiment_type)
 sleep(7)
-start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type = args.experiment_type, wait_between = 2)
+start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type=args.experiment_type, wait_between=2)
 
 # this function is slower, but can be useful if there is some problem with the experiment, since it opens the file and reads the lines
 # consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
+print('In case of crash or missing messages, you can skip this loop with ctrl-c, and the program proceeds as usual')
 try:
     while True:
         sleep(2)
@@ -55,8 +56,8 @@ try:
             break
         for current_value in current_number: # kinda convoluted, but updates to done, if the consumer is finished
             for initial_value in number_of_processes:
-                if current_value ==  initial_value:
-                    current_value[next(iter(current_value))] = 'Done!'
+                if current_value == initial_value:
+                    current_value[next(iter(current_value))] = 'V'
 
         print(current_number, end = '\033[A\033[A\r') # '\033[A' returns a line on linux terminal, and \r returns to the start of line
         # so this goes up two lines, and goes to the start of the line, to overwrite the text
@@ -66,22 +67,22 @@ except KeyboardInterrupt:
 
 sleep(5)
 
-stats_files = kafka_stats.save_docker_stats_kafkas(node_dict, experiment_number, exp_type = args.experiment_type)
-output_files = results.export_output_files(consumer_list, experiment_number, exp_type = args.experiment_type)
+kafka_stats.close_monitoring(node_dict)
+output_files = results.export_output_files(consumer_list, experiment_number, exp_type=args.experiment_type)
 
 for file_ in stats_files:
     print(f'Getting graph for stats file {file_}')
     try:
-        create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type = args.experiment_type)
+        create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type=args.experiment_type)
     except Exception as e:
         print(str(e))
 
 for file_ in output_files:
     print(f'Getting graph for output file {file_}')
     try:
-        create_message_graph(experiment_number, file_, save_image= f'{file_}.svg', clear_csv = args.clear_msg_out, exp_type = args.experiment_type)
+        create_message_graph(experiment_number, file_, save_image= f'{file_}.svg', clear_csv=args.clear_msg_out, exp_type=args.experiment_type)
     except Exception as e:
         print(str(e))
 
-tar_filepath = compact.tar_experiment_dir(experiment_number, exp_type = args.experiment_type)
+tar_filepath = compact.tar_experiment_dir(experiment_number, exp_type=args.experiment_type)
 cloud.gdrive_upload(tar_filepath)
