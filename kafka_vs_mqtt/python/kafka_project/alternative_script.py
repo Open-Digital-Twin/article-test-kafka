@@ -34,6 +34,7 @@ producer_list = producer_stats.get_docker_stats_producers(machine_list)
 topic_list = create_topics.create_topic_per_consumer(consumer_list, args.replication, args.partition, exp_type = args.experiment_type)
 
 number_of_processes = consumer_stats.processes_running(consumer_list)
+print(number_of_processes)
 number_of_producers = len(producer_list)
 number_of_consumers = len(consumer_list)
 

@@ -25,10 +25,10 @@ def processes_running(consumer_list):
     for consumer in consumer_list:
         cmd_docker = ['docker', f'-H {consumer["node"]}', 'top', consumer["consumer"]]    
         result = subprocess.run(cmd_docker, stdout=PIPE, universal_newlines=True)
-        process_list = result.stdout.split('\n') # Each line, after line 0 is a container
+        process_list = result.stdout.split('\n') # Each line, after line 0 is a process
         process_list.pop(0)
 
-        consumer_list_processes.append({consumer["node"]: len(process_list)})
+        consumer_list_processes.append({consumer["consumer"]: len(process_list)})
 
     return consumer_list_processes
 
