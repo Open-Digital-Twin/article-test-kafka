@@ -12,6 +12,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-n', '--n_messages', help='Number of messages sent per producer', nargs = '?', const = 1000, type = int, default = 1000)
 parser.add_argument('-d', '--delay', help='Delay between messages on the producers', nargs = '?', const = 0.01, type = float, default = 0.01)
+parser.add_argument('-pd', '--producer_delay', help='Waiting time beeting starting each producer', nargs = '?', const = 30, type = int, default = 30)
 parser.add_argument('-s', '--message_size', help='Increments message size in chunks of aprox 69 bytes', nargs = '?', const = 0, type = int, default = 0)
 parser.add_argument('-r', '--replication', help='Replication factor per topic', nargs = '?', const = 1, type = int, default = 1)
 parser.add_argument('-p', '--partition', help='Number of partitions per topic', nargs = '?', const = 1, type = int, default = 1)
@@ -42,11 +43,11 @@ msgs_per_topic = int(number_of_producers / number_of_consumers) * args.n_message
 
 call_consumer.start_consumers(topic_list, msgs_per_topic, exp_type=args.experiment_type)
 sleep(7)
-start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type=args.experiment_type, wait_between=2)
+start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type=args.experiment_type, wait_between=args.producer_delay)
 
 # this function is slower, but can be useful if there is some problem with the experiment, since it opens the file and reads the lines
 # consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
-print('In case of crash or missing messages, you can skip this loop with ctrl-c, and the program proceeds as usual')
+print('In case of crash or missing messages, you can skip this loop with ctrl-c, and the program proceeds as usual\n\n\n')
 try:
     while True:
         sleep(2)
@@ -54,13 +55,13 @@ try:
         if current_number == number_of_processes:
             print('All done!')
             break
-        for current_value in current_number: # kinda convoluted, but updates to done, if the consumer is finished
+        for current_value in current_number: # kinda convoluted, but updates to V, if the consumer is finished
             for initial_value in number_of_processes:
                 if current_value == initial_value:
                     current_value[next(iter(current_value))] = 'V'
 
-        print(current_number, end = '\033[A\033[A\r') # '\033[A' returns a line on linux terminal, and \r returns to the start of line
-        # so this goes up two lines, and goes to the start of the line, to overwrite the text
+        print(current_number, end = '\033[A\033[A\033[A\r') # '\033[A' returns a line on linux terminal, and \r returns to the start of line
+        # so this goes up 3 lines, and goes to the start of the line, to overwrite the text
         sleep(1)
 except KeyboardInterrupt:
     pass
