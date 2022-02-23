@@ -79,8 +79,8 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
         plt.ylim([0, 600])
 
     ax1[0].set_ylabel('memory usage (MiB)', color=color)
-    ax1[0].plot(x, mem_usag, color=color, label=f'Max memory usage: {round(usage_mean, 4)}')
-    plt.legend(loc='upper right')
+    ax1[0].plot(x, mem_usag, color=color, label=f'Max memory usage: {int(usage_mean*100)/100}')
+    ax1[0].legend(loc='upper left', bbox_to_anchor=[-0.0001, 0.83])
     ax1[0].tick_params(axis='y', labelcolor=color)
 
     color = 'tab:blue'
@@ -88,9 +88,9 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     ax2.set_ylabel('cpu percentage (%)', color=color)  # we already handled the x-label with ax1
     if not loose_scales:
         plt.ylim([0, 100])
-            
-    ax2.plot(x, cpu_perc, color=color, label=f'mean processor usage: {round(cpu_p_mean, 4)}')
-    plt.legend(loc='upper left')
+    
+    ax2.plot(x, cpu_perc, color=color, label=f'Mean processor usage: {int(cpu_p_mean*100)/100}')
+    ax2.legend(loc='upper left')
     ax2.tick_params(axis='y', labelcolor=color)
 
     graph.tight_layout()  # otherwise the right y-label is slightly clipped
