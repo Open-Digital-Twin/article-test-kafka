@@ -1,16 +1,18 @@
 import pandas as pd
 from os import makedirs
 
-# from auxiliaryfunctions.terminal import print_centralized
+from auxiliaryfunctions.terminal import print_centralized
 
 def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false', exp_type = 'kafka'):
-    # print_centralized(' Creating Message Graph ')
+    print_centralized(' Creating Message Graph ')
 
     file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
 
     panda_csv = pd.read_csv(f'{file_path}csv/{file_to_open}', header = 0)
     csv_header = panda_csv.index
 
+    mean_producer_msg_latency = panda_csv['message_producer_time'].diff().mean()
+    producer_lifetime = panda_csv['message_producer_time'].iloc[-1] - panda_csv['message_producer_time'][0]
     experiment_time = panda_csv['message_consumer_time'].iloc[-1] - panda_csv['message_producer_time'][0]
     time_elapsed_for_kafka = panda_csv['kafka_timestamp'].iloc[-1] - panda_csv['kafka_timestamp'][0] if 'kafka_timestamp' in panda_csv.columns else False
     latencies = panda_csv['message_consumer_time'] - panda_csv['message_producer_time']
@@ -28,14 +30,17 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
     
     ax1.set_ylabel('Latency (seconds)', color=color)
 
+    timelapse_kafka = "Timelapse kafka stamps: " + str(time_elapsed_for_kafka.round(6)) + "\n" if time_elapsed_for_kafka else ""
     ax1.plot(
         csv_header, latencies, color = color,
         label = \
-            f'{"Timelapse kafka stamps: " + str(time_elapsed_for_kafka.round(6)) if time_elapsed_for_kafka else ""} \n' +
+            f'{timelapse_kafka}' +
             f'Experiment timelapse: {experiment_time.round(6)}\n' +
-            f'Mean latency: {latencies.mean().round(6)}\n' +
-            f'First latency: {latencies[0].round(6)}\n' +
-            f'Last latency: {latencies.iloc[-1].round(6)}\n' +
+            f'Producer lifetime:{producer_lifetime.round(6)}\n' +
+            f'Mean producer latency {mean_producer_msg_latency.round(6)}\n'
+            f'Mean message latency: {latencies.mean().round(6)}\n' +
+            f'First message latency: {latencies[0].round(6)}\n' +
+            f'Last message latency: {latencies.iloc[-1].round(6)}\n' +
             f'Message size: {panda_csv["message_size"][0]} :: ' +
             f'Package size: {panda_csv["total_size"][0]}'
     )
@@ -61,12 +66,12 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         plt.show()
 
     if (clear_csv == 'true'):
-        # print_centralized(' Removing csv folder ')
+        print_centralized(' Removing csv folder ')
         from pathlib import Path
         tmp_file = Path(file_path + 'csv/' + file_to_open)
         tmp_file.unlink()
 
-    # print_centralized(' End ')
+    print_centralized(' End ')
 
 if __name__ == '__main__':
     create_message_graph(exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_to_open= 'output_docker_compose.txt', save_image= 'output_docker_compose.png')
