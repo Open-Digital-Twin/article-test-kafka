@@ -67,11 +67,8 @@ except KeyboardInterrupt:
     pass
 
 sleep(5)
-print(node_dict)
-print(producer_stats_dict)
-all_docker_stats_listeners = node_dict.update(producer_stats_dict)
-print(all_docker_stats_listeners)
-sleep(10)
+all_docker_stats_listeners = {**node_dict, **producer_stats_dict}
+
 kafka_stats.close_monitoring(all_docker_stats_listeners)
 output_files = results.export_output_files(consumer_list, experiment_number, exp_type=args.experiment_type)
 
