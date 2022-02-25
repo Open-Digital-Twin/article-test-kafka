@@ -2,21 +2,27 @@ import subprocess
 from time import sleep
 from auxiliaryfunctions.terminal import print_centralized
 
-def get_docker_stats_consumers(machine_list):
+def get_docker_stats_consumers(machine_list, exp_type, exp_number, home_dir = '/home/adbarros'):
     from time import sleep
     print_centralized(' Saving docker stats consumer ')
-    
+    consumer_stats_dict = {}
+    file_list = []
     consumer_list = []
     for containers in machine_list:
         if 'consumer' in machine_list[containers].keys():
             for consumer in machine_list[containers]['consumer']:
                 print(f'Docker stats consumer {consumer} from node {containers}..')
+                file_name = f'producer_stats_{consumer}.txt'
+                file_list.append(file_name)
+                consumer_stats_dict[consumer] = 0
+                with open(f'{home_dir}/{exp_type}_experiment_{exp_number}/csv/{file_name}', 'w+') as f:
+                    cmd_docker = ['docker', f'-H {containers}', 'stats', consumer , '--format', '"{{.Container}}, {{.CPUPerc}}, {{.MemUsage}}, {{.NetIO}}"']
+                    consumer_stats_dict[consumer] = subprocess.Popen(cmd_docker, stdout=f, universal_newlines=True)
+                print(f'Getting docker stats consumer {consumer} from node {containers}..')
                 consumer_list.append({'node': containers, 'consumer': consumer})
-                sleep(1)
-    sleep(1)
     
     print_centralized(' End ')
-    return consumer_list
+    return consumer_list, file_list, consumer_stats_dict
 
 def processes_running(consumer_list):
     from subprocess import PIPE
