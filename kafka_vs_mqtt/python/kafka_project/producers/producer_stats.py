@@ -1,7 +1,7 @@
 from auxiliaryfunctions.terminal import print_centralized
 import subprocess
 
-def get_docker_stats_producers(machine_list, home_dir, exp_type, exp_number):
+def get_docker_stats_producers(machine_list, exp_type, exp_number, home_dir = '/home/adbarros'):
     print_centralized(' Getting stats producers ')
     producer_stats_dict = {}
     file_list = []
