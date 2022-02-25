@@ -30,7 +30,7 @@ machine_list = containers.get_container_structure(node_list, experiment_number, 
 
 node_dict, stats_files = kafka_stats.docker_stats_to_file(machine_list, exp_type=args.experiment_type, exp_number=experiment_number)
 consumer_list = consumer_stats.get_docker_stats_consumers(machine_list)
-producer_list = producer_stats.get_docker_stats_producers(machine_list)
+producer_list, producer_file_list, producer_stats_dict = producer_stats.get_docker_stats_producers(machine_list)
 
 topic_list = create_topics.create_topic_per_consumer(consumer_list, args.replication, args.partition, exp_type = args.experiment_type)
 
@@ -68,10 +68,10 @@ except KeyboardInterrupt:
 
 sleep(5)
 
-kafka_stats.close_monitoring(node_dict)
+kafka_stats.close_monitoring(node_dict.update(producer_stats_dict))
 output_files = results.export_output_files(consumer_list, experiment_number, exp_type=args.experiment_type)
 
-for file_ in stats_files:
+for file_ in stats_files + producer_file_list:
     print(f'Getting graph for stats file {file_}')
     try:
         create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type=args.experiment_type)
