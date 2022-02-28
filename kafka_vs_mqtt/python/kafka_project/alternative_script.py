@@ -78,7 +78,7 @@ results.get_synced_message_latency_average(starting_order, output_files, args.pr
 for file_ in stats_files + producer_file_list + consumer_file_list:
     print(f'Getting graph for stats file {file_}')
     try:
-        create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type=args.experiment_type)
+        create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type=args.experiment_type, clear_csv=args.clear_msg_out)
     except Exception as e:
         print(str(e))
 

@@ -4,7 +4,7 @@ from os import makedirs
 
 from auxiliaryfunctions.terminal import print_centralized
 
-def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', home_folder = '', exp_type = 'kafka'):
+def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', home_folder = '', exp_type = 'kafka', clear_csv = 'false'):
     print_centralized(f' Creating stats graph for: {file_to_open} ')
 
     file_path = f'{home_folder}/{home_dir}{exp_type}_experiment_{exp_num}/'
@@ -126,6 +126,12 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     print(f'"{out}"')
     plt.savefig(out, format = file_type)
     plt.close()
+
+    if (clear_csv == 'true'):
+        # print_centralized(' Removing csv folder ')
+        from pathlib import Path
+        tmp_file = Path(file_path + 'csv/' + file_to_open)
+        tmp_file.unlink()
 
     print_centralized(' End ')
 
