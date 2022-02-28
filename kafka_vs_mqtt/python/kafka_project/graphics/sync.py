@@ -36,8 +36,11 @@ def join_results(file_list = [], exp_num = '', home_dir = '/home/adbarros/', exp
         linked_file = f'{file_path}csv/relative_times/{file_}'
         if (clear_csv == 'true'):
             tmp_file = Path(linked_file)
-            tmp_file.unlink()
-
+            try:
+                tmp_file.unlink()
+            except Exception as e:
+                print(str(e))
+                
     new_df.sort_values(by=['message_producer_time'], inplace=True)
     new_df.to_csv(f'{file_path}csv/output_docker_complete', index=False)
 
