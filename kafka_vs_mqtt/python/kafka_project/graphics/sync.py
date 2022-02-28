@@ -33,10 +33,12 @@ def join_results(file_list = [], exp_num = '', home_dir = '/home/adbarros/', exp
     new_df = pd.read_csv(f'{file_path}csv/relative_times/{file_list[0]}', header = 0)
     
     for file_ in file_list[1:]:
-        linked_file = f'{file_path}csv/relative_times/{file_}'
-        panda_csv = pd.read_csv(linked_file, header = 0)
-        new_df = new_df.append(panda_csv, ignore_index = True)
-    
+        try:
+            linked_file = f'{file_path}csv/relative_times/{file_}'
+            panda_csv = pd.read_csv(linked_file, header = 0)
+            new_df = new_df.append(panda_csv, ignore_index = True)
+        except Exception as e:
+            print(str(e))
     for file_ in file_list:
         linked_file = f'{file_path}csv/relative_times/{file_}'
         if (clear_csv == 'true'):
