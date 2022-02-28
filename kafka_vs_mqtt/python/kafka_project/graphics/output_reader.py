@@ -55,8 +55,12 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         file_to_print = str(save_image)
         file_to_print = file_to_print.strip()
 
-        makedirs(file_path + 'graphs/', exist_ok = True)
-        out = str(file_path + 'graphs/' + file_to_print)
+        target_folder = 'graphs/'
+        if 'out_dtwins' in file_to_open:
+            target_folder = target_folder + 'dtwins_out/'
+
+        makedirs(file_path + target_folder, exist_ok = True)
+        out = str(file_path + target_folder + file_to_print)
         print(f'"{out}"')
 
         file_type = file_to_print.split('.')[-1]
@@ -74,4 +78,4 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
     print_centralized(' End ')
 
 if __name__ == '__main__':
-    create_message_graph(exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_to_open= 'output_docker_compose.txt', save_image= 'output_docker_compose.png')
+    create_message_graph(exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_to_open= 'output_docker_complete', save_image= 'output_docker_complete.png')

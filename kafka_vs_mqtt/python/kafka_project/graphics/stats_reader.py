@@ -119,8 +119,16 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     file_to_print = file_to_save
     file_to_print = file_to_print.strip()
 
-    makedirs(file_path + 'graphs/', exist_ok = True)
-    out = str(file_path + 'graphs/' + file_to_print)
+    target_folder = 'graphs/'
+    if 'consumer' in file_to_open:
+        target_folder = target_folder + 'consumer/'
+    elif 'producer' in file_to_open:
+        target_folder = target_folder + 'producer/'
+    elif 'docker' in file_to_open:
+        target_folder = target_folder + 'docker_nodes/'
+
+    makedirs(file_path + target_folder, exist_ok = True)
+    out = str(file_path + target_folder + file_to_print)
 
     file_type = file_to_print.split('.')[-1]
     print(f'"{out}"')
@@ -128,7 +136,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     plt.close()
 
     if (clear_csv == 'true'):
-        # print_centralized(' Removing csv folder ')
+        print_centralized(' Removing csv folder ')
         from pathlib import Path
         tmp_file = Path(file_path + 'csv/' + file_to_open)
         tmp_file.unlink()
