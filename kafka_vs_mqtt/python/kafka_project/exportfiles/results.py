@@ -42,11 +42,12 @@ def get_synced_message_latency_average(order_list, file_list, time_between_produ
         for file_ in file_list:
             if relationship['consumer'] in file_:
                 current_producer_starting_time = time_between_producers * order
+                print(f'Trying to make time relative in {file_}')
                 try:
                     sync_consumer_out(file_, current_producer_starting_time, exp_num, home_dir, exp_type)
                 except Exception as e:
                     print(str(e))
-                    
+
     join_results(file_list, exp_num, home_dir, exp_type, clear_csv)
 
 if __name__ == '__main__':

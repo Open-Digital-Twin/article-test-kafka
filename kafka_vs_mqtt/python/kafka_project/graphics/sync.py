@@ -10,17 +10,10 @@ def sync_consumer_out(file_ = '', time_zero = 0, exp_num = '', home_dir= '/home/
 
     panda_csv['message_producer_time'] -= first_message_time
     panda_csv['message_consumer_time'] -= first_message_time
-    kafka_relative_time = panda_csv['kafka_timestamp'] - panda_csv['kafka_timestamp'][0] if 'kafka_timestamp' in panda_csv.columns else False
-
-    if kafka_relative_time:
-        panda_csv['kafka_timestamp'] = kafka_relative_time
 
     if time_zero > 0:
         panda_csv['message_producer_time'] += time_zero
         panda_csv['message_consumer_time'] += time_zero
-        if kafka_relative_time:
-            kafka_relative_time += time_zero if 'kafka_timestamp' in panda_csv.columns else False
-            panda_csv['kafka_timestamp'] = kafka_relative_time
 
 
     panda_csv.to_csv(f'{file_path}csv/relative_times/{file_}', index=False)
