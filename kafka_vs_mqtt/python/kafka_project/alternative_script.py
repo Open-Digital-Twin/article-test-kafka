@@ -82,6 +82,8 @@ for file_ in stats_files + producer_file_list + consumer_file_list:
     except Exception as e:
         print(str(e))
 
+output_files.append('output_docker_complete')
+
 for file_ in output_files:
     print(f'Getting graph for output file {file_}')
     try:

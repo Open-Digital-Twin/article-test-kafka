@@ -32,6 +32,10 @@ def join_results(file_list = [], exp_num = '', home_dir = '/home/adbarros/', exp
             new_df = new_df.append(panda_csv, ignore_index = True)
         except Exception as e:
             print(str(e))
+                
+    new_df.sort_values(by=['message_producer_time'], inplace=True)
+    new_df.to_csv(f'{file_path}csv/output_docker_complete', index=False)
+
     for file_ in file_list:
         linked_file = f'{file_path}csv/relative_times/{file_}'
         if (clear_csv == 'true'):
@@ -40,9 +44,6 @@ def join_results(file_list = [], exp_num = '', home_dir = '/home/adbarros/', exp
                 tmp_file.unlink()
             except Exception as e:
                 print(str(e))
-                
-    new_df.sort_values(by=['message_producer_time'], inplace=True)
-    new_df.to_csv(f'{file_path}csv/output_docker_complete', index=False)
 
 if __name__ == '__main__':
     sync_consumer_out(time_zero= 60, exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_= 'output_docker_compose_2.txt')
