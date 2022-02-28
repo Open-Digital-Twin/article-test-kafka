@@ -12,6 +12,7 @@ def create_experiment_folder(home_dir = '/home/adbarros', exp_type = 'kafka'):
     exp_folder = f'/{exp_type}_experiment_{exp_number}'
     makedirs(f'{home_dir}{exp_folder}', exist_ok = True)
     makedirs(f'{home_dir}{exp_folder}/csv', exist_ok = True)
+    makedirs(f'{home_dir}{exp_folder}/csv/relative_times', exist_ok = True)
     makedirs(f'{home_dir}{exp_folder}/graphs', exist_ok = True)
 
     print_centralized(' End ')
@@ -34,6 +35,15 @@ def export_output_files(consumer_list = [], exp_number = 0, home_dir = '/home/ad
     
     print_centralized(' End ')
     return output_files
+
+def get_synced_message_latency_average(order_list, file_list, time_between_producers, exp_num, home_dir= '/home/adbarros/', exp_type = 'kafka', clear_csv = 'false'):
+    from graphics.sync import sync_consumer_out, join_results
+    for order, relationship in enumerate(order_list):
+        for file_ in file_list:
+            if relationship['consumer'] in file_:
+                current_producer_starting_time = time_between_producers * order
+                sync_consumer_out(file_, current_producer_starting_time, exp_num, home_dir, exp_type)
+    join_results(file_list, exp_num, home_dir, exp_type, clear_csv)
 
 if __name__ == '__main__':
     from networkstructure.nodes import get_node_names

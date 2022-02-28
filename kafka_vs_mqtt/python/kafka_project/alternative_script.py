@@ -1,3 +1,4 @@
+from multiprocessing import synchronize
 from time import sleep
 
 from graphics.stats_reader import create_stats_graph
@@ -43,7 +44,7 @@ msgs_per_topic = int(number_of_producers / number_of_consumers) * args.n_message
 
 call_consumer.start_consumers(topic_list, msgs_per_topic, exp_type=args.experiment_type)
 sleep(7)
-start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type=args.experiment_type, wait_between=args.producer_delay)
+starting_order = start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type=args.experiment_type, wait_between=args.producer_delay)
 
 # this function is slower, but can be useful if there is some problem with the experiment, since it opens the file and reads the lines
 # consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
@@ -71,6 +72,8 @@ all_docker_stats_listeners = {**node_dict, **producer_stats_dict, **consumer_sta
 
 kafka_stats.close_monitoring(all_docker_stats_listeners)
 output_files = results.export_output_files(consumer_list, experiment_number, exp_type=args.experiment_type)
+
+results.get_synced_message_latency_average(starting_order, output_files, args.producer_delay, experiment_number, '/home/adbarros/', args.experiment_type, args.clear_msg_out)
 
 for file_ in stats_files + producer_file_list + consumer_file_list:
     print(f'Getting graph for stats file {file_}')

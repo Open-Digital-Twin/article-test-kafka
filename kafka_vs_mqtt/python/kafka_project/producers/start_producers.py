@@ -4,7 +4,7 @@ from auxiliaryfunctions.terminal import print_centralized
 
 def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_size = 0, msg_delay = 0.01, exp_type = 'kafka', limit_conn = True, conn_limit = 1, wait_between = 0):
     topic_per_producer = 1
-
+    starting_order = []
     print_centralized(' Starting producers ')
 
     for topic in topic_list:
@@ -35,12 +35,14 @@ def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_
                 subprocess.Popen(cmd_string, shell=True)
 
                 print(f'From node {producer["node"]}, started producer {producer["producer"]}, in topic {topic["topic"]}')
+                starting_order.append({'consumer': topic['consumer'], 'producer': producer['producer'], 'topic': topic['topic']})
                 if wait_between > 0:
                     print(f'waiting "{wait_between}" seconds for the next producer')
                     sleep(wait_between)
 
-
     print_centralized(' End ')
+
+    return starting_order
 
 if __name__ == '__main__':
     from networkstructure.nodes import get_node_names
