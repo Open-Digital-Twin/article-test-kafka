@@ -2,68 +2,23 @@ import pandas as pd
 import numpy as np
 from os import makedirs
 
-from auxiliaryfunctions.terminal import print_centralized
+# from auxiliaryfunctions.terminal import print_centralized
 
 def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', home_folder = '', exp_type = 'kafka', clear_csv = 'false'):
-    print_centralized(f' Creating stats graph for: {file_to_open} ')
+    # print_centralized(f' Creating stats graph for: {file_to_open} ')
 
     file_path = f'{home_folder}/{home_dir}{exp_type}_experiment_{exp_num}/'
     file_to_save = save_image
 
-    panda_csv = pd.read_csv(file_path + 'csv/' + file_to_open, usecols=[1,2,3], names=['cpu_%', 'mem_usage / limit', 'NetI/O'])
+    panda_csv = pd.read_csv(file_path + 'csv/' + file_to_open, header=0)
 
     panda_csv.replace('', np.nan, inplace=True)
     panda_csv = panda_csv.dropna()
 
-
     x = panda_csv.index
-    cpu_perc = panda_csv['cpu_%'].str.replace('%', '')
-    cpu_perc = pd.to_numeric(cpu_perc, downcast='float')
 
-    net_io_tmp = pd.DataFrame(panda_csv['NetI/O'].str.split('/', 1).tolist(),
-                                        columns = ['Net In', 'Net Out'], index = panda_csv.index)
-
-    mem_tmp2 = pd.DataFrame(panda_csv['mem_usage / limit'].str.split('/', 1).tolist(),
-                                        columns = ['mem_usage', 'limit'], index = panda_csv.index)
-
-    net_in = net_io_tmp['Net In'].str.replace('B','')
-    net_in = net_in.replace(
-            {
-                'k': '*1e3', 
-                'M': '*1e6',
-                'G': '*1e9',  
-                '-':'*-1'
-            }, 
-            regex=True
-        ).map(pd.eval).astype(int)
-    net_in = net_in.div(1000000)
-
-    net_out = net_io_tmp['Net Out'].str.replace('B"','')
-    net_out = net_out.replace(
-            {
-                'k': '*1e3', 
-                'M': '*1e6',
-                'G': '*1e9',
-                '-':'*-1'
-            }, 
-            regex=True
-        ).map(pd.eval).astype(int)
-    net_out = net_out.div(1000000)
-
-    mem_usag = mem_tmp2['mem_usage'].str.replace('B','')
-    mem_usag = mem_usag.replace(
-            {
-                'k': '*1e3', 
-                'Mi': '*1e6', 
-                'Gi': '*1e9', 
-                '-':'*-1'
-            }, 
-            regex=True
-        ).map(pd.eval).astype(int)
-    mem_usag = mem_usag.div(1000000)
-
-    usage_mean = mem_usag.max()
-    cpu_p_mean = cpu_perc.mean()
+    usage_mean = panda_csv['mem_usage'].max()
+    cpu_p_mean = panda_csv['cpu_%'].mean()
 
     # once the file is open, we create the graph
     import matplotlib.pyplot as plt
@@ -79,7 +34,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
         plt.ylim([0, 600])
 
     ax1[0].set_ylabel('memory usage (MiB)', color=color)
-    ax1[0].plot(x, mem_usag, color=color, label=f'Max memory usage: {int(usage_mean*100)/100}')
+    ax1[0].plot(x, panda_csv['mem_usage'], color=color, label=f'Max memory usage: {int(usage_mean*100)/100}')
     ax1[0].legend(loc='upper left', bbox_to_anchor=[-0.0001, 0.83])
     ax1[0].tick_params(axis='y', labelcolor=color)
 
@@ -89,7 +44,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     if not loose_scales:
         plt.ylim([0, 100])
     
-    ax2.plot(x, cpu_perc, color=color, label=f'Mean processor usage: {int(cpu_p_mean*100)/100}')
+    ax2.plot(x, panda_csv['cpu_%'], color=color, label=f'Mean processor usage: {int(cpu_p_mean*100)/100}')
     ax2.legend(loc='upper left')
     ax2.tick_params(axis='y', labelcolor=color)
 
@@ -100,7 +55,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     ax1[1].set_ylabel('Net In (MB)', color=color)  # we already handled the x-label with ax1
     if not loose_scales:
         plt.ylim([0, 100])
-    ax1[1].plot(x, net_in, color=color)
+    ax1[1].plot(x, panda_csv['net_in'], color=color)
     ax1[1].tick_params(axis='y')
 
     graph.tight_layout()  # otherwise the right y-label is slightly clipped
@@ -110,7 +65,7 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     ax4.set_ylabel('Net Out (MB)', color=color)  # we already handled the x-label with ax1
     if not loose_scales:
         plt.ylim([0, 100])
-    ax4.plot(x, net_out, color=color)
+    ax4.plot(x, panda_csv['net_out'], color=color)
     ax4.tick_params(axis='y')
             
 
@@ -136,12 +91,12 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
     plt.close()
 
     if (clear_csv == 'true'):
-        print_centralized(' Removing csv folder ')
+        # print_centralized(' Removing csv folder ')
         from pathlib import Path
         tmp_file = Path(file_path + 'csv/' + file_to_open)
         tmp_file.unlink()
 
-    print_centralized(' End ')
+    # print_centralized(' End ')
 
 if __name__ == '__main__':
-    print(create_stats_graph(exp_num = 636668609, home_folder = 'gitignore', file_to_open = 'docker_stats_14ae06c24a27.txt', save_image = 'docker_stats_14ae06c24a27.txt.svg', home_dir = ''))
+    print(create_stats_graph(exp_num = 636668609, home_folder = 'gitignore', file_to_open = 'docker_stats_1111.txt', save_image = 'docker_stats_1111.txt.svg', home_dir = ''))

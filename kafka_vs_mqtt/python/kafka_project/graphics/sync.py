@@ -1,4 +1,79 @@
+from numpy import append
 import pandas as pd
+
+def sanitize_docker_stats(file_to_open, exp_num, exp_type, home_dir = '/home/adbarros/'):
+    import numpy as np
+    file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
+
+    panda_csv = pd.read_csv(file_path + 'csv/' + file_to_open, usecols=[1, 2, 3], names=['cpu_%', 'mem_usage / limit', 'NetI/O'])
+
+    panda_csv.replace('', np.nan, inplace=True)
+    panda_csv = panda_csv.dropna()
+
+    panda_csv['cpu_%'] = panda_csv['cpu_%'].str.replace('%', '')
+    panda_csv['cpu_%'] = pd.to_numeric(panda_csv['cpu_%'], downcast='float')
+
+    net_io_tmp = pd.DataFrame(panda_csv['NetI/O'].str.split('/', 1).tolist(), columns=['Net In', 'Net Out'], index=panda_csv.index)
+    panda_csv['net_in'], panda_csv['net_out'] = net_io_tmp['Net In'], net_io_tmp['Net Out']
+
+    mem_temp = pd.DataFrame(panda_csv['mem_usage / limit'].str.split('/', 1).tolist(), columns=['mem_usage', 'limit'], index=panda_csv.index)
+    panda_csv['mem_usage'] = mem_temp['mem_usage']
+    # panda_csv['limit'] = mem_temp['limit']
+
+    panda_csv.pop('mem_usage / limit')
+    panda_csv.pop('NetI/O')
+
+    panda_csv['net_in'] = panda_csv['net_in'].replace(
+            {
+                'B': '',
+                'k': '*1e3', 
+                'M': '*1e6',
+                'G': '*1e9',  
+                '-':'*-1'
+            }, 
+            regex=True
+        ).map(pd.eval).astype(int)
+    panda_csv['net_in'] = panda_csv['net_in'].div(1000000)
+
+    panda_csv['net_out'] = panda_csv['net_out'].replace(
+            {
+                'B"': '',
+                'k': '*1e3', 
+                'M': '*1e6',
+                'G': '*1e9',
+                '-':'*-1'
+            }, 
+            regex=True
+        ).map(pd.eval).astype(int)
+    panda_csv['net_out'] = panda_csv['net_out'].div(1000000)
+
+    panda_csv['mem_usage'] = panda_csv['mem_usage'].replace(
+            {
+                'B': '',
+                'k': '*1e3', 
+                'Mi': '*1e6', 
+                'Gi': '*1e9', 
+                '-':'*-1'
+            }, 
+            regex=True
+        ).map(pd.eval).astype(int)
+    panda_csv['mem_usage'] = panda_csv['mem_usage'].div(1000000)
+
+    # panda_csv['limit'] = panda_csv['limit'].replace(
+    #         {
+    #             'B': '',
+    #             'k': '*1e3', 
+    #             'Mi': '*1e6', 
+    #             'Gi': '*1e9', 
+    #             '-':'*-1'
+    #         }, 
+    #         regex=True
+    #     ).map(pd.eval).astype(int)
+    # panda_csv['limit'] = panda_csv['limit'].div(1000000)
+
+    panda_csv.to_csv(f'{file_path}csv/{file_to_open}', index=False)
+
+
 
 
 def sync_consumer_out(file_ = '', time_zero = 0, exp_num = '', home_dir= '/home/adbarros/', exp_type = 'kafka'):
@@ -45,8 +120,42 @@ def join_results(file_list = [], exp_num = '', home_dir = '/home/adbarros/', exp
             except Exception as e:
                 print(str(e))
 
+
+def sum_docker_stats(machine, machine_dict, file_list, exp_num, home_dir, exp_type):
+
+    file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
+
+    consumer_files = []
+    for target in machine_dict['consumer']:
+        for file_ in file_list:
+            if target in file_list:
+                consumer_files.append(file_)
+    consumer_df = pd.read_csv(f'{file_path}csv/{consumer_files[0]}', header = 0)
+    for file_ in consumer_files:
+        file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
+        consumer_df = pd.concat([consumer_df, file_df]).sum()
+    consumer_df.to_csv(f'{file_path}csv/docker_consumer_stats_sum_{machine}', index=False)
+
+    producer_files = []
+    for target in machine_dict['producer']:
+        for file_ in file_list:
+            if target in file_list:
+                producer_files.append(file_)
+    producer_df = pd.read_csv(f'{file_path}csv/{producer_files[0]}', header = 0)
+    for file_ in producer_files:
+        file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
+        producer_df = pd.concat([producer_df, file_df]).sum()   
+    consumer_df.to_csv(f'{file_path}csv/docker_producer_stats_sum_{machine}', index=False)
+
+    total_df = pd.concat([consumer_df, producer_df]).sum()
+    total_df.to_csv(f'{file_path}csv/docker_total_stats_sum_{machine}', index=False)
+
+    return [f'docker_total_stats_sum_{machine}', f'docker_producer_stats_sum_{machine}', f'docker_consumer_stats_sum_{machine}']
+
 if __name__ == '__main__':
-    sync_consumer_out(time_zero= 60, exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_= 'output_docker_compose_2.txt')
-    sync_consumer_out(time_zero= 30, exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_= 'output_docker_compose_1.txt')
-    sync_consumer_out(time_zero= 0, exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_= 'output_docker_compose.txt')
-    join_results(exp_num= 636668609, clear_csv='true', file_list=['output_docker_compose_2.txt','output_docker_compose_1.txt','output_docker_compose.txt'], home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/')
+    # sync_consumer_out(time_zero= 60, exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_= 'output_docker_compose_2.txt')
+    # sync_consumer_out(time_zero= 30, exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_= 'output_docker_compose_1.txt')
+    # sync_consumer_out(time_zero= 0, exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_= 'output_docker_compose.txt')
+    # join_results(exp_num= 636668609, clear_csv='true', file_list=['output_docker_compose_2.txt','output_docker_compose_1.txt','output_docker_compose.txt'], home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/')
+
+    sanitize_docker_stats(home_dir = '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_to_open = 'docker_stats_1111.txt', exp_num = '636668609', exp_type = 'kafka')

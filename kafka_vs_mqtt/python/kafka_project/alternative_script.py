@@ -1,4 +1,5 @@
 from multiprocessing import synchronize
+from platform import machine
 from time import sleep
 
 from graphics.stats_reader import create_stats_graph
@@ -8,6 +9,7 @@ from exportfiles import cloud, compact, results
 from consumers import consumer_stats, call_consumer
 from producers import producer_stats, start_producers
 from kafkas import create_topics, kafka_stats
+from graphics.sync import sanitize_docker_stats
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -20,6 +22,8 @@ parser.add_argument('-p', '--partition', help='Number of partitions per topic', 
 parser.add_argument('-c', '--clear_msg_out', help='Clears csv files after the experiment (helpful if there are too many messages)', nargs = '?', const = 'false', type = str, default = 'false')
 parser.add_argument('-t', '--experiment_type', help='Which experiment type to do (kafka or mqtt)', nargs='?', const = 'kafka', type = str, default = 'kafka')
 args = parser.parse_args()
+
+home_dir = '/home/adbarros/'
 
 if (not args.experiment_type in ('kafka', 'mqtt')):
     print('Invalid experiment typing, must be either "kafka" or "mqtt"')
@@ -73,11 +77,14 @@ all_docker_stats_listeners = {**node_dict, **producer_stats_dict, **consumer_sta
 kafka_stats.close_monitoring(all_docker_stats_listeners)
 output_files = results.export_output_files(consumer_list, experiment_number, exp_type=args.experiment_type)
 
+producer_consumer_file_list = producer_file_list + consumer_file_list
 results.get_synced_message_latency_average(starting_order, output_files, args.producer_delay, experiment_number, '/home/adbarros/', args.experiment_type, args.clear_msg_out)
+# machine_total_usage_files = results.get_usage_per_docker_machine(machine_list, producer_consumer_file_list, experiment_number, home_dir, args.experiment_type)
 
-for file_ in stats_files + producer_file_list + consumer_file_list:
+for file_ in stats_files + producer_consumer_file_list:
     print(f'Getting graph for stats file {file_}')
     try:
+        sanitize_docker_stats(file_, experiment_number, exp_type=args.experiment_type, home_dir='/home/adbarros/')
         create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type=args.experiment_type, clear_csv=args.clear_msg_out)
     except Exception as e:
         print(str(e))

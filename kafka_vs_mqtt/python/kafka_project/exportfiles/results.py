@@ -50,6 +50,16 @@ def get_synced_message_latency_average(order_list, file_list, time_between_produ
 
     join_results(file_list, exp_num, home_dir, exp_type, clear_csv)
 
+def get_usage_per_docker_machine(net_structure, file_list, exp_num, home_dir= '/home/adbarros/', exp_type = 'kafka'):
+    from graphics.sync import sum_docker_stats
+    sum_file_list = []
+    for machine in net_structure.keys():
+        for container_type in net_structure[machine]:
+            if container_type in ('consumer','producer'):
+                sum_file_list = sum_file_list + sum_docker_stats(machine, net_structure[machine], file_list, exp_num, home_dir, exp_type)
+
+    return sum_file_list
+
 if __name__ == '__main__':
     from networkstructure.nodes import get_node_names
     node_list = get_node_names()
