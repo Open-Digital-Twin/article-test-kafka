@@ -82,9 +82,17 @@ results.get_synced_message_latency_average(starting_order, output_files, args.pr
 # machine_total_usage_files = results.get_usage_per_docker_machine(machine_list, producer_consumer_file_list, experiment_number, home_dir, args.experiment_type)
 
 for file_ in stats_files + producer_consumer_file_list:
-    print(f'Getting graph for stats file {file_}')
+    print(f'Sanitizing graph for stats file {file_}')
     try:
         sanitize_docker_stats(file_, experiment_number, exp_type=args.experiment_type, home_dir='/home/adbarros/')
+    except Exception as e:
+        print(str(e))
+
+machine_stats_sum = results.get_usage_per_docker_machine(machine_list, producer_consumer_file_list, experiment_number, home_dir, exp_type=args.experiment_type)
+
+for file_ in stats_files + producer_consumer_file_list + machine_stats_sum:
+    print(f'Getting graph for stats file {file_}')
+    try:
         create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type=args.experiment_type, clear_csv=args.clear_msg_out)
     except Exception as e:
         print(str(e))
