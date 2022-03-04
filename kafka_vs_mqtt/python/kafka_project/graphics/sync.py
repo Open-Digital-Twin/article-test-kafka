@@ -134,7 +134,8 @@ def sum_docker_stats(machine, machine_dict, file_list, exp_num, home_dir, exp_ty
     consumer_df = pd.read_csv(f'{file_path}csv/{consumer_files[0]}', header = 0)
     for file_ in consumer_files:
         file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
-        consumer_df = pd.concat([consumer_df, file_df]).sum()
+        consumer_df = consumer_df.add(file_df, fill_value=0)
+
     consumer_df.to_csv(f'{file_path}csv/docker_consumer_stats_sum_{machine}', index=False)
 
     producer_files = []
@@ -145,10 +146,11 @@ def sum_docker_stats(machine, machine_dict, file_list, exp_num, home_dir, exp_ty
     producer_df = pd.read_csv(f'{file_path}csv/{producer_files[0]}', header = 0)
     for file_ in producer_files:
         file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
-        producer_df = pd.concat([producer_df, file_df]).sum()   
+        producer_df = producer_df.add(file_df, fill_value=0)
+
     consumer_df.to_csv(f'{file_path}csv/docker_producer_stats_sum_{machine}', index=False)
 
-    total_df = pd.concat([consumer_df, producer_df]).sum()
+    total_df = producer_df.add(consumer_df, fill_value=0)
     total_df.to_csv(f'{file_path}csv/docker_total_stats_sum_{machine}', index=False)
 
     return [f'docker_total_stats_sum_{machine}', f'docker_producer_stats_sum_{machine}', f'docker_consumer_stats_sum_{machine}']
