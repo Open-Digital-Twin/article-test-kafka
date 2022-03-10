@@ -131,6 +131,8 @@ def sum_docker_stats(machine, machine_dict, file_list, exp_num, home_dir, exp_ty
             if target in file_:
                 consumer_files.append(file_)
     
+    print(f'Consumer files for machine {machine}: {consumer_files}')
+
     consumer_df = pd.read_csv(f'{file_path}csv/{consumer_files[0]}', header = 0)
     for file_ in consumer_files:
         file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
@@ -143,6 +145,9 @@ def sum_docker_stats(machine, machine_dict, file_list, exp_num, home_dir, exp_ty
         for file_ in file_list:
             if target in file_:
                 producer_files.append(file_)
+
+    print(f'Producer files for machine {machine}: {producer_files}')
+
     producer_df = pd.read_csv(f'{file_path}csv/{producer_files[0]}', header = 0)
     for file_ in producer_files:
         file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
