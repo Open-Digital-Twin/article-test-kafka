@@ -129,7 +129,7 @@ def sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type):
 
     consumer_files = [] # PORQUE CARALHOS ESSA LISTA TEM PRODUCERS
     for file_ in file_list:
-        if 'consumer' and machine in file_:
+        if ('consumer' in file_) and (machine in file_):
             consumer_files.append(file_)
     
     print(f'Consumer files for machine {machine}: {consumer_files}')
@@ -143,7 +143,7 @@ def sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type):
 
     producer_files = []
     for file_ in file_list:
-        if 'producer' and machine in file_:
+        if ('producer' in file_) and (machine in file_):
             producer_files.append(file_)
 
     print(f'Producer files for machine {machine}: {producer_files}')
