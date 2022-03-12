@@ -125,7 +125,9 @@ def sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type):
 
     file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
 
-    consumer_files = []
+    print(f'All files in {machine}: {file_list}')
+
+    consumer_files = [] # PORQUE CARALHOS ESSA LISTA TEM PRODUCERS
     for file_ in file_list:
         if 'consumer' and machine in file_:
             consumer_files.append(file_)
