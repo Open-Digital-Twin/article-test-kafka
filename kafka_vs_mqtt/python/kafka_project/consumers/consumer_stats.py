@@ -12,7 +12,7 @@ def get_docker_stats_consumers(machine_list, exp_type, exp_number, home_dir = '/
         if 'consumer' in machine_list[containers].keys():
             for consumer in machine_list[containers]['consumer']:
                 print(f'Docker stats consumer {consumer} from node {containers}..')
-                file_name = f'consumer_stats_{consumer}.txt'
+                file_name = f'consumer_stats_{consumer}_{containers}.txt'
                 file_list.append(file_name)
                 consumer_stats_dict[consumer] = 0
                 with open(f'{home_dir}/{exp_type}_experiment_{exp_number}/csv/{file_name}', 'w+') as f:

@@ -33,9 +33,9 @@ experiment_number = results.create_experiment_folder(exp_type=args.experiment_ty
 node_list = nodes.get_node_names()
 machine_list = containers.get_container_structure(node_list, experiment_number, exp_type=args.experiment_type)
 
-node_dict, stats_files = kafka_stats.docker_stats_to_file(machine_list, exp_type=args.experiment_type, exp_number=experiment_number)
-consumer_list, consumer_file_list, consumer_stats_dict = consumer_stats.get_docker_stats_consumers(machine_list, exp_type=args.experiment_type, exp_number=experiment_number)
-producer_list, producer_file_list, producer_stats_dict = producer_stats.get_docker_stats_producers(machine_list, exp_type=args.experiment_type, exp_number=experiment_number)
+kafka_stats_dict, kafka_stats_files = kafka_stats.docker_stats_to_file(machine_list, exp_type=args.experiment_type, exp_number=experiment_number)
+consumer_list, consumer_stats_files, consumer_stats_dict = consumer_stats.get_docker_stats_consumers(machine_list, exp_type=args.experiment_type, exp_number=experiment_number)
+producer_list, producer_stats_files, producer_stats_dict = producer_stats.get_docker_stats_producers(machine_list, exp_type=args.experiment_type, exp_number=experiment_number)
 
 topic_list = create_topics.create_topic_per_consumer(consumer_list, args.replication, args.partition, exp_type = args.experiment_type)
 
@@ -72,25 +72,25 @@ except KeyboardInterrupt:
     pass
 
 sleep(5)
-all_docker_stats_listeners = {**node_dict, **producer_stats_dict, **consumer_stats_dict}
+all_docker_stats_listeners = {**kafka_stats_dict, **producer_stats_dict, **consumer_stats_dict}
 
 kafka_stats.close_monitoring(all_docker_stats_listeners)
 output_files = results.export_output_files(consumer_list, experiment_number, exp_type=args.experiment_type)
 
-producer_consumer_file_list = producer_file_list + consumer_file_list
+producer_consumer_stats_files = producer_stats_files + consumer_stats_files
 results.get_synced_message_latency_average(starting_order, output_files, args.producer_delay, experiment_number, '/home/adbarros/', args.experiment_type, args.clear_msg_out)
-# machine_total_usage_files = results.get_usage_per_docker_machine(machine_list, producer_consumer_file_list, experiment_number, home_dir, args.experiment_type)
+# machine_total_usage_files = results.get_usage_per_docker_machine(machine_list, producer_consumer_stats_files, experiment_number, home_dir, args.experiment_type)
 
-for file_ in stats_files + producer_consumer_file_list:
+for file_ in kafka_stats_files + producer_consumer_stats_files:
     print(f'Sanitizing graph for stats file {file_}')
     try:
         sanitize_docker_stats(file_, experiment_number, exp_type=args.experiment_type, home_dir='/home/adbarros/')
     except Exception as e:
         print(str(e))
 
-machine_stats_sum = results.get_usage_per_docker_machine(machine_list, producer_consumer_file_list, experiment_number, home_dir, exp_type=args.experiment_type)
+machine_stats_sum = results.get_usage_per_docker_machine(machine_list, producer_consumer_stats_files, experiment_number, home_dir, exp_type=args.experiment_type)
 
-for file_ in stats_files + producer_consumer_file_list + machine_stats_sum:
+for file_ in kafka_stats_files + producer_consumer_stats_files + machine_stats_sum:
     print(f'Getting graph for stats file {file_}')
     try:
         create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type=args.experiment_type, clear_csv=args.clear_msg_out)

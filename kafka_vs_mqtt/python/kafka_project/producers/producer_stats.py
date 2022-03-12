@@ -10,7 +10,7 @@ def get_docker_stats_producers(machine_list, exp_type, exp_number, home_dir = '/
         if 'producer' in machine_list[containers].keys():
             for producer in machine_list[containers]['producer']:
                 print(f'Getting docker stats producer {producer} from node {containers}..')
-                file_name = f'producer_stats_{producer}.txt'
+                file_name = f'producer_stats_{producer}__{containers}.txt'
                 file_list.append(file_name)
                 producer_stats_dict[producer] = 0
                 with open(f'{home_dir}/{exp_type}_experiment_{exp_number}/csv/{file_name}', 'w+') as f:
