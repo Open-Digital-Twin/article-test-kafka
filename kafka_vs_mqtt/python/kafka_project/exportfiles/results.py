@@ -54,7 +54,8 @@ def get_usage_per_docker_machine(net_structure, file_list, exp_num, home_dir= '/
     from graphics.sync import sum_docker_stats
     sum_file_list = []
     for machine in net_structure.keys():
-        sum_file_list = sum_file_list + sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type)
+        if 'producer' and 'consumer' in net_structure[machine]:
+            sum_file_list = sum_file_list + sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type)
 
     return sum_file_list
 
