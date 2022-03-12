@@ -121,15 +121,14 @@ def join_results(file_list = [], exp_num = '', home_dir = '/home/adbarros/', exp
                 print(str(e))
 
 
-def sum_docker_stats(machine, machine_dict, file_list, exp_num, home_dir, exp_type):
+def sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type):
 
     file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
 
     consumer_files = []
-    for target in machine_dict['consumer']:
-        for file_ in file_list:
-            if target in file_:
-                consumer_files.append(file_)
+    for file_ in file_list:
+        if 'consumer' and machine in file_:
+            consumer_files.append(file_)
     
     print(f'Consumer files for machine {machine}: {consumer_files}')
 
@@ -141,10 +140,9 @@ def sum_docker_stats(machine, machine_dict, file_list, exp_num, home_dir, exp_ty
     consumer_df.to_csv(f'{file_path}csv/docker_consumer_stats_sum_{machine}', index=False)
 
     producer_files = []
-    for target in machine_dict['producer']:
-        for file_ in file_list:
-            if target in file_:
-                producer_files.append(file_)
+    for file_ in file_list:
+        if 'producer' and machine in file_:
+            producer_files.append(file_)
 
     print(f'Producer files for machine {machine}: {producer_files}')
 
