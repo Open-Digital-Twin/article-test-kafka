@@ -121,7 +121,7 @@ def join_results(file_list = [], exp_num = '', home_dir = '/home/adbarros/', exp
                 print(str(e))
 
 
-def sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type):
+def docker_stats_per_machine(machine, file_list, exp_num, home_dir, exp_type):
 
     file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
 
@@ -166,6 +166,49 @@ def sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type):
     total_df.to_csv(f'{file_path}csv/docker_total_stats_sum_{machine}', index=False)
 
     return [f'docker_total_stats_sum_{machine}', f'docker_producer_stats_sum_{machine}', f'docker_consumer_stats_sum_{machine}', f'docker_producer_stats_mean_{machine}', f'docker_consumer_stats_mean_{machine}']
+
+
+def sum_docker_stats(file_list, exp_num, home_dir, exp_type):
+
+    file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
+
+    print(f'All files in: {file_list}')
+
+    consumer_files = []
+    for file_ in file_list:
+        if ('consumer' in file_):
+            consumer_files.append(file_)
+    
+    print(f'Consumer files: {consumer_files}')
+
+    consumer_df_sum = pd.read_csv(f'{file_path}csv/{consumer_files[0]}', header = 0)
+
+    for file_ in consumer_files[1:]:
+        file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
+        consumer_df_sum = consumer_df_sum.add(file_df, fill_value=0)
+
+    consumer_df_sum.to_csv(f'{file_path}csv/docker_consumer_stats_sum_total', index=False)
+
+    producer_files = []
+    for file_ in file_list:
+        if ('producer' in file_):
+            producer_files.append(file_)
+
+    print(f'Producer files: {producer_files}')
+
+    producer_df_sum = pd.read_csv(f'{file_path}csv/{producer_files[0]}', header = 0)
+    for file_ in producer_files[1:]:
+        file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
+        producer_df_sum = producer_df_sum.add(file_df, fill_value=0)
+
+
+    producer_df_sum.to_csv(f'{file_path}csv/docker_producer_stats_sum_total', index=False)
+
+    total_df = producer_df_sum.add(consumer_df_sum, fill_value=0)
+    total_df.to_csv(f'{file_path}csv/docker_total_stats_sum', index=False)
+
+    return [f'docker_total_stats_sum', f'docker_producer_stats_sum_total', f'docker_consumer_stats_sum_total']
+
 
 if __name__ == '__main__':
     # sync_consumer_out(time_zero= 60, exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_= 'output_docker_compose_2.txt')
