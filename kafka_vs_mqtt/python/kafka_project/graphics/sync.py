@@ -140,7 +140,7 @@ def sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type):
     for file_ in consumer_files[1:]:
         file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
         consumer_df_sum = consumer_df_sum.add(file_df, fill_value=0)
-        consumer_df_mean = consumer_df_mean.mean(file_df, fill_value=0)
+        consumer_df_mean = pd.concat([consumer_df_mean, file_df]).groupby(level=0).mean()
 
     consumer_df_mean.to_csv(f'{file_path}csv/docker_consumer_stats_mean_{machine}', index=False)
     consumer_df_sum.to_csv(f'{file_path}csv/docker_consumer_stats_sum_{machine}', index=False)
@@ -157,7 +157,7 @@ def sum_docker_stats(machine, file_list, exp_num, home_dir, exp_type):
     for file_ in producer_files[1:]:
         file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
         producer_df_mean = producer_df_mean.add(file_df, fill_value=0)
-        producer_df_mean = producer_df_mean.mean(file_df, fill_value=0)
+        producer_df_mean = pd.concat([producer_df_mean, file_df]).groupby(level=0).mean()
 
     producer_df_mean.to_csv(f'{file_path}csv/docker_producer_stats_mean_{machine}', index=False)
     producer_df_mean.to_csv(f'{file_path}csv/docker_producer_stats_sum_{machine}', index=False)
