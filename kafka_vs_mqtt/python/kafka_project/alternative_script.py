@@ -47,7 +47,7 @@ number_of_consumers = len(consumer_list)
 msgs_per_topic = int(number_of_producers / number_of_consumers) * args.n_messages
 
 call_consumer.start_consumers(topic_list, msgs_per_topic, exp_type=args.experiment_type)
-sleep(7)
+sleep(2)
 starting_order = start_producers.start_producers(producer_list, topic_list, args.n_messages, args.message_size, args.delay, exp_type=args.experiment_type, wait_between=args.producer_delay)
 
 # this function is slower, but can be useful if there is some problem with the experiment, since it opens the file and reads the lines
