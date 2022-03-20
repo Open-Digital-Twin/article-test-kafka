@@ -64,7 +64,6 @@ time_elapsed = 0
 try:
     while True:
         sleep(refresh_time)
-        system('clear')
         current_number = consumer_stats.processes_running(consumer_list)
         if current_number == number_of_processes:
             print('All done!')
@@ -73,6 +72,7 @@ try:
             for initial_value in number_of_processes:
                 if current_value == initial_value:
                     current_value[next(iter(current_value))] = 'V'
+        system('clear')
         print(current_number) # '\033[A' returns a line on linux terminal, and \r returns to the start of line
         time_elapsed += refresh_time
         if time_elapsed > expected_worst_time:

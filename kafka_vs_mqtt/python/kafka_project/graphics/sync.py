@@ -198,7 +198,7 @@ def sum_docker_stats(file_list, exp_num, home_dir, exp_type):
 
     producer_df_sum = pd.read_csv(f'{file_path}csv/{producer_files[0]}', header = 0, skiprows=[i for i in range(1,11)])
     for file_ in producer_files[1:]:
-        file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0, skiprows=11)
+        file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0, skiprows=[i for i in range(1,11)])
         producer_df_sum = producer_df_sum.add(file_df, fill_value=0)
 
 
