@@ -85,7 +85,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         axis = range(len(numbers))
 
         cubic_interploation_model=interp1d(axis,numbers,kind="cubic")
-        xs=np.linspace(1,7,500)
+        xs=np.linspace(1,len(numbers) - 1, 500)
         ys=cubic_interploation_model(xs)
 
         ax1.clear()
