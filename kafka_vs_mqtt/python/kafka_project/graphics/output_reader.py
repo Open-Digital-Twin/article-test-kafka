@@ -20,7 +20,7 @@ def smooth2(scalars, weight, mean_latency):  # Weight between 0 and 1
     return smoothed
 
 
-def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false', exp_type = 'kafka'):
+def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false', exp_type = 'kafka', expected_complete_num = 0):
     # print_centralized(' Creating Message Graph ')
 
     file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
@@ -33,6 +33,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
     experiment_time = panda_csv['message_consumer_time'].iloc[-1] - panda_csv['message_producer_time'][0]
     time_elapsed_for_kafka = panda_csv['kafka_timestamp'].iloc[-1] - panda_csv['kafka_timestamp'][0] if 'kafka_timestamp' in panda_csv.columns else False
     latencies = panda_csv['message_consumer_time'] - panda_csv['message_producer_time']
+
 
     import matplotlib.pyplot as plt
     plt.rcParams['axes.facecolor'] = (0.5,0.5,0.5,0.5)
@@ -56,6 +57,9 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
             f'Last message latency: {latencies.iloc[-1].round(6)}\n' + \
             f'Message size: {panda_csv["message_size"][0]} :: ' + \
             f'Package size: {panda_csv["total_size"][0]}'
+
+    if (len(latencies) < expected_complete_num) and 'complete' in file_to_open:
+        labels + f'\nMissing amount of messages: {expected_complete_num - len(latencies)}'
 
     timelapse_kafka = "Timelapse kafka stamps: " + str(time_elapsed_for_kafka.round(6)) + "\n" if time_elapsed_for_kafka else ""
     ax1.plot(

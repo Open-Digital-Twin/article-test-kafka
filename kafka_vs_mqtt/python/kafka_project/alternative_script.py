@@ -1,6 +1,7 @@
 from multiprocessing import synchronize
 from platform import machine
 from time import sleep
+from os import system
 
 from graphics.stats_reader import create_stats_graph
 from graphics.output_reader import create_message_graph
@@ -53,9 +54,17 @@ starting_order = start_producers.start_producers(producer_list, topic_list, args
 # this function is slower, but can be useful if there is some problem with the experiment, since it opens the file and reads the lines
 # consumer_stats.is_experiment_finished(consumer_list, msgs_per_topic)
 print('In case of crash or missing messages, you can skip this loop with ctrl-c, and the program proceeds as usual\n\n\n')
+refresh_time = 2
+total_waiting_time = (args.producer_delay * len(topic_list)) * 1.25
+expected_time_for_last_producer = (msgs_per_topic * args.delay) * 1.7
+
+expected_worst_time = ((total_waiting_time + expected_time_for_last_producer) + total_waiting_time) * 1.25
+
+time_elapsed = 0
 try:
     while True:
-        sleep(2)
+        sleep(refresh_time)
+        system('clear')
         current_number = consumer_stats.processes_running(consumer_list)
         if current_number == number_of_processes:
             print('All done!')
@@ -64,10 +73,11 @@ try:
             for initial_value in number_of_processes:
                 if current_value == initial_value:
                     current_value[next(iter(current_value))] = 'V'
-
-        print(current_number, end = '\033[A\033[A\033[A\r') # '\033[A' returns a line on linux terminal, and \r returns to the start of line
-        # so this goes up 3 lines, and goes to the start of the line, to overwrite the text
-        sleep(1)
+        print(current_number) # '\033[A' returns a line on linux terminal, and \r returns to the start of line
+        time_elapsed += refresh_time
+        if time_elapsed > expected_worst_time:
+            print(f'Could not finish experiment, missing messages')
+            break
 except KeyboardInterrupt:
     pass
 
@@ -105,7 +115,7 @@ output_files.append('output_docker_complete')
 for file_ in output_files:
     print(f'Getting graph for output file {file_}')
     try:
-        create_message_graph(experiment_number, file_, save_image= f'{file_}.svg', clear_csv=args.clear_msg_out, exp_type=args.experiment_type)
+        create_message_graph(experiment_number, file_, save_image= f'{file_}.svg', clear_csv=args.clear_msg_out, exp_type=args.experiment_type, expected_complete_num=(msgs_per_topic * len(topic_list)))
     except Exception as e:
         print(str(e))
 
