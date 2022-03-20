@@ -56,9 +56,6 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
             f'Package size: {panda_csv["total_size"][0]}'
     )
 
-    ax1.plot(smooth2(scalars=latencies, weight=.9, mean_latency=latencies.mean().round(6)))
-
-
     plt.legend(loc='upper right')
     plt.grid(True, color = 'grey')
 
@@ -79,6 +76,12 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
 
         file_type = file_to_print.split('.')[-1]
         plt.savefig(out, format=file_type)
+        
+        ax1.clear()
+        ax1.plot(smooth2(scalars=latencies, weight=.9, mean_latency=latencies.mean().round(6)))
+
+        plt.savefig(f'{out}_smooth', format=file_type)
+
         plt.close()
     else:
         plt.show()
