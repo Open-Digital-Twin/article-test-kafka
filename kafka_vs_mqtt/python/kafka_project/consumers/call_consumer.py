@@ -18,9 +18,6 @@ def start_consumers(topic_list = [], msg_num = 1000, exp_type = 'kafka'):
 
         print(f'From node {consumer["node"]}, started consumer {consumer["consumer"]}, in topic {consumer["topic"]}')
 
-        sleep(2)
-
-    sleep(1)
     print_centralized(' End ')
 
 if __name__ == '__main__':

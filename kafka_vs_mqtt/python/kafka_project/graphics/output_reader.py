@@ -8,9 +8,15 @@ def smooth2(scalars, weight, mean_latency):  # Weight between 0 and 1
     low_value_start = (mean_latency * weight) + ((1 - weight) * scalars[0]) 
     smoothed = [low_value_start]
     for position, point in enumerate(scalars[1:], start=1):
-        smoothed_val = (smoothed[position-1] * weight) + ((1 - weight) * point) 
+        smoothed_val = (smoothed[position-1] * weight) + ((1 - weight) * point)
+        # if smoothed_val > mean_latency: 
+        #     smoothed_val = (mean_latency * weight) + ((1 - weight) * smoothed_val)
+        # if smoothed_val < mean_latency: 
+        #     smoothed_val = (mean_latency * weight) + ((1 - weight) * smoothed_val)
         smoothed.append(smoothed_val)                      
-        
+
+
+
     return smoothed
 
 
@@ -41,19 +47,21 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
     
     ax1.set_ylabel('Latency (seconds)', color=color)
 
+    labels = \
+            f'Experiment timelapse: {experiment_time.round(6)}\n' + \
+            f'Producer lifetime:{producer_lifetime.round(6)}\n' + \
+            f'Mean producer latency {mean_producer_msg_latency.round(6)}\n' + \
+            f'Mean message latency: {latencies.mean().round(6)}\n' + \
+            f'First message latency: {latencies[0].round(6)}\n' + \
+            f'Last message latency: {latencies.iloc[-1].round(6)}\n' + \
+            f'Message size: {panda_csv["message_size"][0]} :: ' + \
+            f'Package size: {panda_csv["total_size"][0]}'
+
     timelapse_kafka = "Timelapse kafka stamps: " + str(time_elapsed_for_kafka.round(6)) + "\n" if time_elapsed_for_kafka else ""
     ax1.plot(
         csv_header, latencies, color = color,
         label = \
-            f'{timelapse_kafka}' +
-            f'Experiment timelapse: {experiment_time.round(6)}\n' +
-            f'Producer lifetime:{producer_lifetime.round(6)}\n' +
-            f'Mean producer latency {mean_producer_msg_latency.round(6)}\n'
-            f'Mean message latency: {latencies.mean().round(6)}\n' +
-            f'First message latency: {latencies[0].round(6)}\n' +
-            f'Last message latency: {latencies.iloc[-1].round(6)}\n' +
-            f'Message size: {panda_csv["message_size"][0]} :: ' +
-            f'Package size: {panda_csv["total_size"][0]}'
+            f'{timelapse_kafka}' + labels
     )
 
     plt.legend(loc='upper right')
@@ -78,19 +86,26 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         plt.savefig(out, format=file_type)
 
         # create smooth graph
-        from scipy.interpolate import interp1d
-        import numpy as np 
-
-        numbers = smooth2(scalars=latencies, weight=.9, mean_latency=latencies.mean().round(6))
-        axis = range(len(numbers))
-
-        cubic_interploation_model=interp1d(axis,numbers,kind="cubic")
-        xs=np.linspace(1,len(numbers) - 1, 500)
-        ys=cubic_interploation_model(xs)
-
+        # from scipy.interpolate import interp1d
+        # import numpy as np 
         ax1.clear()
+        mean_latency=latencies.mean().round(6)
         
-        ax1.plot(ys)
+        numbers = smooth2(scalars=latencies, weight=.9, mean_latency=mean_latency)
+        # print(max(numbers))
+        plt.ylim([0, 5*mean_latency])
+        # cubic_interploation_model = interp1d(range(len(numbers)), numbers, kind = "cubic")
+        
+        # Plotting the Graph
+        # X_=np.linspace(1, len(numbers)-1, 150)
+        # Y_=cubic_interploation_model(X_)
+
+        print(labels)
+        ax1.plot(
+            numbers,         
+            label = \
+                f'{timelapse_kafka}' + labels
+        )
 
         plt.savefig(f'{out}_smooth.{file_type}', format=file_type)
 
