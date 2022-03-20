@@ -1,21 +1,20 @@
 import pandas as pd
 from os import makedirs
 
-# from auxiliaryfunctions.terminal import print_centralized
+from auxiliaryfunctions.terminal import print_centralized
 
-def smooth(scalars, weight): # Weight between 0 and 1
-    last = scalars[0]  # First value in the plot (first timestep)
-    smoothed = list()
-    for point in scalars:
-        smoothed_val = last * weight + (1 - weight) * point  # Calculate smoothed value
-        smoothed.append(smoothed_val)                        # Save it
-        last = smoothed_val                                  # Anchor the last smoothed value
+
+def smooth2(scalars, weight): # Weight between 0 and 1
+    smoothed = [scalars[0]]
+    for position, point in enumerate(scalars[1:], start=1):
+        smoothed_val = (smoothed[position-1] * weight) + ((1 - weight) * point) 
+        smoothed.append(smoothed_val)                      
         
     return smoothed
 
 
 def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false', exp_type = 'kafka'):
-    # print_centralized(' Creating Message Graph ')
+    print_centralized(' Creating Message Graph ')
 
     file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
 
@@ -56,7 +55,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
             f'Package size: {panda_csv["total_size"][0]}'
     )
 
-    ax1.plot(smooth(latencies, .9))
+    ax1.plot(smooth2(latencies, .9))
 
 
     plt.legend(loc='upper right')
@@ -84,12 +83,12 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         plt.show()
 
     if (clear_csv == 'true'):
-        # print_centralized(' Removing csv folder ')
+        print_centralized(' Removing csv folder ')
         from pathlib import Path
         tmp_file = Path(file_path + 'csv/' + file_to_open)
         tmp_file.unlink()
 
-    # print_centralized(' End ')
+    print_centralized(' End ')
 
 if __name__ == '__main__':
     create_message_graph(exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_to_open= 'output_docker_complete', save_image= 'output_docker_complete.png')
