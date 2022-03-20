@@ -1,7 +1,7 @@
 import pandas as pd
 from os import makedirs
 
-from auxiliaryfunctions.terminal import print_centralized
+# from auxiliaryfunctions.terminal import print_centralized
 
 
 def smooth2(scalars, weight, mean_latency):  # Weight between 0 and 1
@@ -15,7 +15,7 @@ def smooth2(scalars, weight, mean_latency):  # Weight between 0 and 1
 
 
 def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false', exp_type = 'kafka'):
-    print_centralized(' Creating Message Graph ')
+    # print_centralized(' Creating Message Graph ')
 
     file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
 
@@ -76,23 +76,35 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
 
         file_type = file_to_print.split('.')[-1]
         plt.savefig(out, format=file_type)
-        
-        ax1.clear()
-        ax1.plot(smooth2(scalars=latencies, weight=.9, mean_latency=latencies.mean().round(6)))
 
-        plt.savefig(f'{out}_smooth', format=file_type)
+        # create smooth graph
+        from scipy.interpolate import interp1d
+        import numpy as np 
+
+        numbers = smooth2(scalars=latencies, weight=.9, mean_latency=latencies.mean().round(6))
+        axis = range(len(numbers))
+
+        cubic_interploation_model=interp1d(axis,numbers,kind="cubic")
+        xs=np.linspace(1,7,500)
+        ys=cubic_interploation_model(xs)
+
+        ax1.clear()
+        
+        ax1.plot(ys)
+
+        plt.savefig(f'{out}_smooth.{file_type}', format=file_type)
 
         plt.close()
     else:
         plt.show()
 
     if (clear_csv == 'true'):
-        print_centralized(' Removing csv folder ')
+        # print_centralized(' Removing csv folder ')
         from pathlib import Path
         tmp_file = Path(file_path + 'csv/' + file_to_open)
         tmp_file.unlink()
 
-    print_centralized(' End ')
+    # print_centralized(' End ')
 
 if __name__ == '__main__':
     create_message_graph(exp_num= 636668609, home_dir= '/home/andreo/Dropbox/DropWorkspace/kafka/article-test-kafka/kafka_vs_mqtt/python/kafka_project/graphics/gitignore/', file_to_open= 'output_docker_complete', save_image= 'output_docker_complete.png')
