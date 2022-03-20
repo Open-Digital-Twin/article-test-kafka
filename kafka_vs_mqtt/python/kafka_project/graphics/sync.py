@@ -207,7 +207,7 @@ def sum_docker_stats(file_list, exp_num, home_dir, exp_type):
     total_df = producer_df_sum.add(consumer_df_sum, fill_value=0)
     total_df.to_csv(f'{file_path}csv/docker_total_stats_sum', index=False)
 
-    return [f'docker_total_stats_sum', f'docker_producer_stats_sum_total', f'docker_consumer_stats_sum_total']
+    return [f'docker_clients_total_stats_sum', f'docker_producer_stats_sum_total', f'docker_consumer_stats_sum_total']
 
 
 if __name__ == '__main__':

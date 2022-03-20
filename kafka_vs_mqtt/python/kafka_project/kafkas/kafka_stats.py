@@ -44,6 +44,23 @@ def get_docker_stats_nodes(machine_list = '', exp_type = 'kafka'):
     print_centralized(' End ')
     return kafka_dict
 
+def sum_node_stats(node_file_list = [], exp_num = 0, exp_type = 'kafka', home_dir = '/home/adbarros'):
+    import pandas as pd
+
+    file_path = f'{home_dir}{exp_type}_experiment_{exp_num}/'
+
+    print(f'All files in: {node_file_list}')
+    
+    consumer_df_sum = pd.read_csv(f'{file_path}csv/{node_file_list[0]}', header = 0)
+
+    for file_ in node_file_list[1:]:
+        file_df = pd.read_csv(f'{file_path}csv/{file_}', header = 0)
+        consumer_df_sum = consumer_df_sum.add(file_df, fill_value=0)
+
+    consumer_df_sum.to_csv(f'{file_path}csv/docker_stats_node_sum.txt')
+    return ['docker_stats_node_sum.txt']
+    
+
 def docker_stats_to_file(machine_list = '', exp_type = 'kafka', exp_number = 0, home_dir = '/home/adbarros'):
 
     print_centralized(' Getting stats kafkas ')
@@ -56,7 +73,7 @@ def docker_stats_to_file(machine_list = '', exp_type = 'kafka', exp_number = 0, 
         if (exp_type in machine_list[machine].keys()):
             for kafka in machine_list[machine][exp_type]:
                 ##Collecting kafka container stats
-                file_name = f'docker_stats_{kafka}.txt'
+                file_name = f'docker_stats_{exp_type}_{kafka}.txt'
                 file_list.append(file_name)
                 kafka_dict[kafka] = 0
                 with open(f'{home_dir}/{exp_type}_experiment_{exp_number}/csv/{file_name}', 'w+') as f:

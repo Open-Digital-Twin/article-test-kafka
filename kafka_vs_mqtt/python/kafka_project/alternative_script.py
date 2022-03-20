@@ -88,9 +88,12 @@ for file_ in kafka_stats_files + producer_consumer_stats_files:
     except Exception as e:
         print(str(e))
 
+for file_ in kafka_stats_files:
+    node_sum = kafka_stats.sum_node_stats(kafka_stats_files, exp_num = experiment_number, exp_type=args.experiment_type, home_dir = home_dir)
+
 machine_stats_sum = results.get_usage_per_docker_machine(machine_list, producer_consumer_stats_files, experiment_number, home_dir, exp_type=args.experiment_type)
 
-for file_ in kafka_stats_files + producer_consumer_stats_files + machine_stats_sum:
+for file_ in kafka_stats_files + producer_consumer_stats_files + machine_stats_sum + node_sum:
     print(f'Getting graph for stats file {file_}')
     try:
         create_stats_graph(experiment_number, file_, save_image= f'{file_}.svg', exp_type=args.experiment_type, clear_csv=args.clear_msg_out)
