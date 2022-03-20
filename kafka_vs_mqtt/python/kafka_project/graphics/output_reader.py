@@ -4,8 +4,9 @@ from os import makedirs
 from auxiliaryfunctions.terminal import print_centralized
 
 
-def smooth2(scalars, weight): # Weight between 0 and 1
-    smoothed = [scalars[0]]
+def smooth2(scalars, weight, mean_latency):  # Weight between 0 and 1
+    low_value_start = (mean_latency * weight) + ((1 - weight) * scalars[0]) 
+    smoothed = [low_value_start]
     for position, point in enumerate(scalars[1:], start=1):
         smoothed_val = (smoothed[position-1] * weight) + ((1 - weight) * point) 
         smoothed.append(smoothed_val)                      
@@ -55,7 +56,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
             f'Package size: {panda_csv["total_size"][0]}'
     )
 
-    ax1.plot(smooth2(latencies, .9))
+    ax1.plot(smooth2(scalars=latencies, weight=.9, mean_latency=latencies.mean().round(6)))
 
 
     plt.legend(loc='upper right')
