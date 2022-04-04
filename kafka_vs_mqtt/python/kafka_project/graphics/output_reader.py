@@ -4,21 +4,33 @@ from os import makedirs
 # from auxiliaryfunctions.terminal import print_centralized
 
 
-def smooth2(scalars, weight, mean_latency):  # Weight between 0 and 1
-    low_value_start = (mean_latency * weight) + ((1 - weight) * scalars[0]) 
-    smoothed = [low_value_start]
-    for position, point in enumerate(scalars[1:], start=1):
-        smoothed_val = (smoothed[position-1] * weight) + ((1 - weight) * point)
-        # if smoothed_val > mean_latency: 
-        #     smoothed_val = (mean_latency * weight) + ((1 - weight) * smoothed_val)
-        # if smoothed_val < mean_latency: 
-        #     smoothed_val = (mean_latency * weight) + ((1 - weight) * smoothed_val)
-        smoothed.append(smoothed_val)                      
+# define the true objective function
+def objective(x, a, b, c, d):
+    from numpy import sin
+    return a * sin(b - x) + c * x**2 + d
 
-
-
-    return smoothed
-
+def find_aproximated_curve(x, y, plt, ax1):
+    # fit a line to the economic data
+    from numpy import arange
+    from pandas import read_csv
+    from scipy.optimize import curve_fit
+    from matplotlib import pyplot
+    
+    # curve fit
+    popt, _ = curve_fit(objective, x, y)
+    # summarize the parameter values
+    a, b, c, d = popt
+    print(popt)
+    # plot input vs output
+    pyplot.scatter(x, y)
+    # define a sequence of inputs between the smallest and largest known inputs
+    x_line = arange(min(x), max(x), 1)
+    # calculate the output for the range
+    y_line = objective(x_line, a, b, c, d)
+    # create a line plot for the mapping function
+    # pyplot.plot(x_line, y_line, '--', color='red')
+    # pyplot.show()
+    return x_line
 
 def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false', exp_type = 'kafka', expected_complete_num = 0):
     # print_centralized(' Creating Message Graph ')
@@ -89,30 +101,23 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         file_type = file_to_print.split('.')[-1]
         plt.savefig(out, format=file_type)
 
-        # create smooth graph
-        # from scipy.interpolate import interp1d
-        # import numpy as np 
-        ax1.clear()
-        mean_latency=latencies.mean().round(6)
-        
-        numbers = smooth2(scalars=latencies, weight=.9, mean_latency=mean_latency)
-        # print(max(numbers))
-        plt.ylim([0, 5*mean_latency])
-        # cubic_interploation_model = interp1d(range(len(numbers)), numbers, kind = "cubic")
-        
-        # Plotting the Graph
-        # X_=np.linspace(1, len(numbers)-1, 150)
-        # Y_=cubic_interploation_model(X_)
+        try:
+            ax1.clear()
+            mean_latency=latencies.mean().round(6)
 
-        print(labels)
-        ax1.plot(
-            numbers,         
-            label = \
-                f'{timelapse_kafka}' + labels
-        )
+            numbers = find_aproximated_curve(panda_csv['message_consumer_time'], latencies, plt, ax1)
+            plt.ylim([0, 5*mean_latency])
 
-        plt.savefig(f'{out}_smooth.{file_type}', format=file_type)
+            print(labels)
+            ax1.plot(
+                numbers,         
+                label = \
+                    f'{timelapse_kafka}' + labels
+            )
 
+            plt.savefig(f'{out}_smooth.{file_type}', format=file_type)
+        except Exception:
+            pass
         plt.close()
     else:
         plt.show()
