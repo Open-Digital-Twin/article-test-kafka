@@ -30,7 +30,7 @@ def find_aproximated_curve(x, y, plt, ax1):
     # create a line plot for the mapping function
     # pyplot.plot(x_line, y_line, '--', color='red')
     # pyplot.show()
-    return x_line
+    return y_line
 
 def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, save_image= '', home_dir= '/home/adbarros/', clear_csv = 'false', exp_type = 'kafka', expected_complete_num = 0):
     # print_centralized(' Creating Message Graph ')
