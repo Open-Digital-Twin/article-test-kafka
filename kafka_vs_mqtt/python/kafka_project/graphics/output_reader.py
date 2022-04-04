@@ -9,7 +9,7 @@ def objective(x, a, b, c, d):
     from numpy import sin
     return a * sin(b - x) + c * x**2 + d
 
-def find_aproximated_curve(x, y, plt, ax1):
+def find_aproximated_curve(y, x, plt, ax1):
     # fit a line to the economic data
     from numpy import arange
     from pandas import read_csv
