@@ -63,7 +63,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
 
     timelapse_kafka = "Timelapse kafka stamps: " + str(time_elapsed_for_kafka.round(6)) + "\n" if time_elapsed_for_kafka else ""
     ax1.plot(
-        csv_header, latencies, color = color,
+        panda_csv['message_producer_time'], latencies, color = color,
         label = \
             f'{timelapse_kafka}' + labels
     )
@@ -71,7 +71,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
     plt.legend(loc='upper right')
     plt.grid(True, color = 'grey')
 
-    ax1.tick_params(axis = 'y', labelcolor = color)
+    ax1.tick_params(axis = 'both', labelcolor = color)
 
     graph.tight_layout()  # otherwise the right y-label is slightly clipped
     if len(save_image) > 0:
