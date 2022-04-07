@@ -18,7 +18,7 @@ services:
     networks:
      kafka_net:
     deploy:
-      replicas: 3
+      replicas: 10
       placement:    
         constraints:
           - node.labels.kafka_role==producer_pair
@@ -29,7 +29,7 @@ services:
     networks:
      kafka_net:
     deploy:
-      replicas: 3
+      replicas: 10
       placement:    
         constraints:
           - node.labels.kafka_role==producer_pair
