@@ -17,6 +17,10 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
 
     x = panda_csv.index
 
+    mem_total = panda_csv['mem_usage'].iloc[-1] - panda_csv['mem_usage'][0]
+    net_out_total = panda_csv['net_out'].iloc[-1] - panda_csv['net_out'][0]
+    net_in_total = panda_csv['net_in'].iloc[-1] - panda_csv['net_in'][0]
+
     usage_mean = panda_csv['mem_usage'].max()
     cpu_p_mean = panda_csv['cpu_%'].mean()
 
@@ -34,7 +38,13 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
         plt.ylim([0, 600])
 
     ax1[0].set_ylabel('memory usage (MiB)', color=color)
-    ax1[0].plot(x, panda_csv['mem_usage'], color=color, label=f'Max memory usage: {int(usage_mean*100)/100}')
+    ax1[0].plot(
+        x, panda_csv['mem_usage'], color=color, 
+        label=f'Max memory usage: {int(usage_mean*100)/100}\n' + \
+            f'Total memory: {mem_total}\n' + \
+            f'Total net in: {net_out_total}\n' + \
+            f'Total net out: {net_in_total}'
+        )
     ax1[0].legend(loc='upper left', bbox_to_anchor=[-0.0001, 0.83])
     ax1[0].tick_params(axis='y', labelcolor=color)
 

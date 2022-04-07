@@ -9,8 +9,8 @@ def smooth2(scalars, weight, mean_latency):  # Weight between 0 and 1
     smoothed = [low_value_start]
     for position, point in enumerate(scalars[1:], start=1):
         smoothed_val = (smoothed[position-1] * weight) + ((1 - weight) * point)
-        # if smoothed_val > mean_latency: 
-        #     smoothed_val = (mean_latency * weight) + ((1 - weight) * smoothed_val)
+        if smoothed_val > mean_latency: 
+            smoothed_val = (mean_latency * weight) + ((1 - weight) * smoothed_val)
         # if smoothed_val < mean_latency: 
         #     smoothed_val = (mean_latency * weight) + ((1 - weight) * smoothed_val)
         smoothed.append(smoothed_val)                      
@@ -62,8 +62,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         labels + f'\nMissing amount of messages: {expected_complete_num - len(latencies)}'
 
     timelapse_kafka = "Timelapse kafka stamps: " + str(time_elapsed_for_kafka.round(6)) + "\n" if time_elapsed_for_kafka else ""
-    ax1.plot(
-        panda_csv['message_producer_time'], latencies, color = color,
+    ax1.plot(panda_csv['message_consumer_time'], latencies, color = color,
         label = \
             f'{timelapse_kafka}' + labels
     )
@@ -95,7 +94,7 @@ def create_message_graph(exp_num = '', file_to_open = '', loose_scales= True, sa
         ax1.clear()
         mean_latency=latencies.mean().round(6)
         
-        numbers = smooth2(scalars=latencies, weight=.7, mean_latency=mean_latency)
+        numbers = smooth2(scalars=latencies, weight=.6, mean_latency=mean_latency)
         # print(max(numbers))
         plt.ylim([0, 5*mean_latency])
         # cubic_interploation_model = interp1d(range(len(numbers)), numbers, kind = "cubic")
