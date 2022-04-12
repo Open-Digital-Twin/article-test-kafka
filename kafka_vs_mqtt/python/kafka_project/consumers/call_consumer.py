@@ -15,9 +15,10 @@ def start_consumers(topic_list = [], msg_num = 1000, exp_type = 'kafka'):
             cmd_container = cmd_docker + ['python3', f'{exp_type}_consumer.py', '-t', consumer['topic'], '-s', f'experiment_{exp_type}', '-p', 1883, '-n', f'{msg_num}']
 
         cmd_string = ' '.join([str(item) for item in cmd_container])
-        subprocess.Popen(cmd_string, shell=True)
-
+        sp = subprocess.Popen(cmd_string, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        (out, err) = sp.communicate()
         print(f'From node {consumer["node"]}, started consumer {consumer["consumer"]}, in topic {consumer["topic"]}')
+        print(f'Std Error: {err}')
 
     print_centralized(' End ')
 
