@@ -11,6 +11,7 @@ def start_consumers(topic_list = [], msg_num = 1000, exp_type = 'kafka'):
         if exp_type == 'kafka':
             cmd_container = cmd_docker + ['python3', f'{exp_type}_consumer.py', '-t', consumer['topic'], '-s', f'experiment_{exp_type}', '-p', '9094', '-n', f'{msg_num}']
         else:
+            sleep(1)
             cmd_container = cmd_docker + ['python3', f'{exp_type}_consumer.py', '-t', consumer['topic'], '-s', f'experiment_{exp_type}', '-p', 1883, '-n', f'{msg_num}']
 
         cmd_string = ' '.join([str(item) for item in cmd_container])
