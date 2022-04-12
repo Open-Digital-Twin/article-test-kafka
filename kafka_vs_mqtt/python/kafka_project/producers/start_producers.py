@@ -32,7 +32,7 @@ def start_producers(producer_list = [], topic_list = [], msg_number = 1000, msg_
                     cmd_container = cmd_docker + ['python3', f'{exp_type}_producer.py', '-t', topic['topic'], '-s', f'experiment_{exp_type}', '-p', 1883, '-n', msg_number, '-d', msg_delay, '-e', msg_size]
                 
                 cmd_string = ' '.join([str(item) for item in cmd_container])
-                sp =subprocess.Popen(cmd_string, shell=True)
+                sp = subprocess.Popen(cmd_string, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
                 (out, err) = sp.communicate()
 
                 print(f'From node {producer["node"]}, started producer {producer["producer"]}, in topic {topic["topic"]}')
