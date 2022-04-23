@@ -42,8 +42,8 @@ def create_stats_graph(exp_num= '', file_to_open= '', loose_scales= True, save_i
         x, panda_csv['mem_usage'], color=color, 
         label=f'Max memory usage: {int(usage_mean*100)/100}\n' + \
             f'Total memory: {mem_total}\n' + \
-            f'Total net in: {net_out_total}\n' + \
-            f'Total net out: {net_in_total}'
+            f'Total net in: {net_in_total}\n' + \
+            f'Total net out: {net_out_total}'
         )
     ax1[0].legend(loc='upper left', bbox_to_anchor=[-0.0001, 0.83])
     ax1[0].tick_params(axis='y', labelcolor=color)
